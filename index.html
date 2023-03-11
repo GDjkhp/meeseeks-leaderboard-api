@@ -1,0 +1,181 @@
+<head>
+    <style>
+        /* Colors */
+        :root {
+            --primary-color: #7289da;
+            --secondary-color: #99aab5;
+            --background-color: #36393f;
+            --text-color: #ffffff;
+        }
+
+        @font-face {
+            font-family: font;
+            src: url(../gdjkhp.github.io/fonts/AmaticSC-Regular.ttf);
+        }
+
+        body {
+            font-family: font;
+            background-color: black;
+            color: white;
+        }
+
+        /* Rank card */
+        .rank-card {
+            background-color: var(--background-color);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100px;
+            padding: 20px;
+            width: 500px;
+
+            /* center */
+            margin: auto;
+        }
+
+        .rank-card-avatar {
+            border-radius: 50%;
+            overflow: hidden;
+            height: 100px;
+            width: 100px;
+
+            position: absolute;
+            margin: auto;
+        }
+
+        .rank-card-avatar img {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Progress bar */
+        .progress {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            height: 20px;
+            margin-bottom: 1px;
+            overflow: hidden;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .progress-bar {
+            background-color: var(--primary-color);
+            height: 100%;
+        }
+
+        .progress-label {
+            font-size: 16px;
+        }
+
+        .progress-label-current {
+            font-size: 16px;
+        }
+        .progress-label-limit {
+            font-size: 16px;
+            opacity: 0.7;
+        }
+
+        /* let me take it from here */
+        div, span {
+            /* border: 1px solid black; */
+        }
+        .info {
+            width: 75%;
+            margin-left: 25%;
+        }
+        /* user section */
+        .usernamegroup {
+            display: flex;
+            justify-content: space-between;
+        }
+        .username {
+            font-size: 24px;
+        }
+        .discriminator {
+            font-size: 16px;
+            opacity: 0.7;
+        }
+        /* rank section */
+        .rankgroup {
+            text-align: right;
+        }
+        .rank {
+            font-size: 16px;
+        }
+        .rank-number {
+            font-size: 32px;
+        }
+        .level {
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+        .level-number {
+            font-size: 32px;
+            color: var(--primary-color);
+        }
+        /* footer section */
+        .footergroup {
+            display: flex;
+            justify-content: space-between;
+        }
+        .serverpng {
+            width: 16px;
+            height: 16px;
+        }
+        .otherstats {
+            font-size: 16px;
+            opacity: 0.7;
+        }
+        .servername {
+            font-size: 16px;
+            opacity: 0.7;
+        }
+
+        .querygroup {
+            width: 500px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .foot {
+            margin: auto;
+            text-align: center;
+        }
+        a {
+            /* text-decoration: none; */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="querygroup">
+        <span>meeseeks-leaderboard-api</span>
+        <br>
+        <span>by gdjkhp</span>
+        <br>
+        <br>
+
+        <select value="" id="serverIdSelect">
+            <option value="gmd">GeometryDash</option>
+            <option value="mc">Minecraft</option>
+            <option value="tml">Terraria</option>
+        </select>
+
+        <!-- <input type="text" value="" id="serverId"> -->
+        <input type="text" value="" id="name">
+
+        <input type="button" value="Parse" id="text" onclick="parseServer();">
+    </div>
+    <div class="foot">
+        <br>
+        <span>Limitations: Can only parse the first 1000 ranked players.</span>
+        <br>
+        <span>Nothing is logged or stored in the server. All fetched data are publicly available in:</span>
+        <br>
+        <a id="link"></a>
+    </div>
+    <script src="meeseeks-script.js"></script>
+</body>
