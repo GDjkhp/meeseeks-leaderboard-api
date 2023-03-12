@@ -139,7 +139,6 @@
         }
 
         .querygroup {
-            width: 500px;
             margin: auto;
             text-align: center;
         }
@@ -172,10 +171,13 @@
         <input type="text" value="" id="name">
 
         <input type="button" value="Parse" id="text" onclick="parseServer();">
+        <!-- <br><br> -->
+        <!-- <input type="button" value="Refresh" onclick="refresh();"> -->
     </div>
     <div class="foot">
-        <br>
-        <span>Limitations: Can only parse the first 1000 ranked players.</span>
+        <span>Parameters: 1-10000 (rank), Username (case-sensitive)</span>
+        <br><br>
+        <span>Limitations: Can only parse the first 10000 ranked players.</span>
         <br>
         <span>Nothing is logged or stored in the server. All fetched data are publicly available in:</span>
         <br>
