@@ -1,10 +1,10 @@
-var result, page = 0, serverId;
+var result, page = 0, serverId, queue, queueLimit;
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
     result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
-    await delay();
+    await delay(500);
 }
 
 // TODO: load using server id
@@ -38,6 +38,7 @@ async function load(sel) {
 // returns a neat rank card
 async function parseProfile(player, target) {
     if (player == null) return;
+    addCard();
 
     const user = document.getElementsByClassName('realusername')[target];
     user.innerHTML = player.username;
@@ -73,13 +74,14 @@ async function parseProfile(player, target) {
     servername.innerHTML = result.guild.name;
 }
 
-// parse nth ranked player, delays 500ms
+// parse nth ranked player, delays 1ms
 async function parseByRank(number) {
+    queueLimit = number;
     for(var index = 0; index < number; index++) {
         if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-        addCard();
         parseProfile(result.players[index - (page * 1000)], index);
-        await delay();
+        addQueue();
+        await delay(1);
     }
 }
 
@@ -94,10 +96,13 @@ async function getRank(player) {
 
 // returns player by searching username
 async function getPlayerByName(name) {
+    queueLimit += 1000;
     for(var i = 0; i < result.players.length; i++) {
+        addQueue();
+        await delay(1);
         if (name == result.players[i].username) return result.players[i];
     }
-    if (await nextPage()) return await getPlayerByName(name); 
+    if (await nextPage()) return await getPlayerByName(name);
     else return null;
 }
 
@@ -108,6 +113,13 @@ async function nextPage() {
         await loadJSON(serverId);
         return true;
     } else return false;
+}
+
+// queue info
+function addQueue() {
+    queue++;
+    var text = document.getElementById('text');
+    text.value = "Parsing... " + queue + "/" + queueLimit;
 }
 
 // FIXME: only accepts 0-1000
@@ -124,18 +136,19 @@ async function parseServer() {
 
     parse.value = "Parsing...";
     destroyCards();
-    page = 0;
+    page = 0; queue = 0, queueLimit = 0;
 
     //loadId(id);
     await load(sel);
 
     if (isNaN(name.value)) {
-        addCard();
         await parseProfile(await getPlayerByName(name.value), 0);
         parse.value = "Parse";
-    } else { // TODO: serverId as input
+        parse.disabled = false;
+    } else {
         await parseByRank(name.value);
         parse.value = "Parse";
+        parse.disabled = false;
     }
 }
 
@@ -169,9 +182,9 @@ function setLink(fuck, shit) {
 setInterval(randomLink, 500);
 
 // utils
-function delay() {
+function delay(ms) {
 	return new Promise((resolve, reject) => {
-		setTimeout(resolve, 500);
+		setTimeout(resolve, ms);
 	});
 }
 
