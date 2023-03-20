@@ -1,4 +1,4 @@
-var result, page = 0, serverId, queue, queueLimit;
+var result, page, serverId, queue, queueLimit;
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
@@ -9,7 +9,8 @@ async function loadJSON(id) {
 
 // TODO: load using server id
 async function loadId(id) {
-    await loadJSON(id.value + "?limit=1000&page=" + page);
+    serverId = id;
+    await loadJSON(id);
 }
 
 // load pre defined servers
@@ -18,7 +19,6 @@ async function load(sel) {
     // minecraft: 302094807046684672
     // terraria: 251072485095636994
     // query: ?limit=1000&page=1
-    
     switch(sel.value) {
         case "gmd":
             serverId = "398627612299362304";
@@ -30,7 +30,7 @@ async function load(sel) {
             break;
         case "tml":
             serverId = "251072485095636994";
-            await loadJSON(serverId );
+            await loadJSON(serverId);
             break;
     }
 }
@@ -47,7 +47,7 @@ async function parseProfile(player, target) {
     discordtag.innerHTML = "#" + player.discriminator;
 
     const rank = document.getElementsByClassName('rank-number')[target];
-    rank.innerHTML = "#" + (await getRank(player) + page * 1000);
+    rank.innerHTML = "#" + await getRank(player);
 
     const level = document.getElementsByClassName('level-number')[target];
     level.innerHTML = player.level;
@@ -74,57 +74,110 @@ async function parseProfile(player, target) {
     servername.innerHTML = result.guild.name;
 }
 
-// parse nth ranked player, delays 1ms
-async function parseByRank(number) {
-    queueLimit = number;
-    for(var index = 0; index < number; index++) {
-        if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-        parseProfile(result.players[index - (page * 1000)], index);
-        addQueue();
-        await delay(1);
-    }
-}
-
 // returns player rank
 async function getRank(player) {
     for(var i = 0; i < result.players.length; i++) {
-        if (player.username == result.players[i].username) return i+1;
+        if (player.username == result.players[i].username) return page * 1000 + i + 1;
     }
     if (await nextPage()) return await getRank(player); 
     else return null;
 }
 
+// parse nth ranked player
+async function parseByRank(number) {
+    queueLimit = number;
+    for(var index = 0; index < number; index++) {
+        if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
+        parseProfile(result.players[index - (page * 1000)], index);
+        await addQueue();
+    }
+}
+
 // returns player by searching username
-async function getPlayerByName(name) {
+async function getPlayerByName(name, discriminator) {
     queueLimit += 1000;
     for(var i = 0; i < result.players.length; i++) {
-        addQueue();
-        await delay(1);
-        if (name == result.players[i].username) return result.players[i];
+        await addQueue();
+        if (discriminator != "") {
+            if (name == result.players[i].username && 
+                discriminator == result.players[i].discriminator) 
+                return result.players[i];
+        }
+        else if (name == result.players[i].username) return result.players[i];
     }
     if (await nextPage()) return await getPlayerByName(name);
     else return null;
 }
 
+// returns player by searching user id
+async function getPlayerById(id) {
+    queueLimit += 1000;
+    for(var i = 0; i < result.players.length; i++) {
+        await addQueue();
+        if (id == result.players[i].id) return result.players[i];
+    }
+    if (await nextPage()) return await getPlayerById(id);
+    else return null;
+}
+
 // loose code to fetch nth page and status
 async function nextPage() {
-    if (page < 10) { // page limit
+    if (result.players.length != 0) {
         page++;
         await loadJSON(serverId);
         return true;
     } else return false;
 }
 
-// queue info
-function addQueue() {
+// queue info, delays 1ms
+async function addQueue() {
     queue++;
     var text = document.getElementById('text');
     text.value = "Parsing... " + queue + "/" + queueLimit;
+    await delay(1);
 }
 
 // FIXME: only accepts 0-1000
 function randomPlayer() {
     return result.players[Math.floor(Math.random() * result.players.length)];
+}
+
+// blazingly fast player locator
+async function getUsingRank(text) { 
+    if (text.split("#")[0] == "") { 
+        var rankMinus1 = text.split("#")[1]-1;
+        page = rankMinus1 / 1000 >> 0;
+        await loadJSON(serverId);
+        parseProfile(result.players[(rankMinus1%1000)], 0);        
+    } else {
+        parseProfile(await getPlayerByName(text.split("#")[0], text.split("#")[1]), 0); // very accurate input cuz yes
+    }
+}
+
+// top rank range
+async function rankRange(text) {
+    if (text.search("-") != -1) { 
+        var left = text.split("-")[0];
+        var right = text.split("-")[1];
+        page = Math.min(left, right) / 1000 >> 0;
+        await loadJSON(serverId);
+        for (var index = Math.min(left, right)-1, target = 0; index < Math.max(left, right); index++, target++) {
+            if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
+            parseProfile(result.players[index - (page * 1000)], target);
+            await addQueue();
+        }
+    }
+}
+
+async function theNeighborsKid(bruh) {
+    if (bruh.search("-") == -1) {
+        parseProfile(await getPlayerByName(bruh, ""), 0);
+    } else await rankRange(bruh);
+}
+
+async function yourMom(pussy) {
+    if (pussy.toString().length == 18) parseProfile(await getPlayerById(pussy), 0);
+    else await parseByRank(pussy);
 }
 
 // main function (fetch button)
@@ -136,20 +189,17 @@ async function parseServer() {
 
     parse.value = "Parsing...";
     destroyCards();
-    page = 0; queue = 0, queueLimit = 0;
+    page = 0; queue = 0; queueLimit = 0;
 
-    //loadId(id);
+    //await loadId(id);
     await load(sel);
 
-    if (isNaN(name.value)) {
-        await parseProfile(await getPlayerByName(name.value), 0);
-        parse.value = "Parse";
-        parse.disabled = false;
-    } else {
-        await parseByRank(name.value);
-        parse.value = "Parse";
-        parse.disabled = false;
-    }
+    if (!isNaN(name.value)) await yourMom(name.value);
+    else if (name.value.search("#") != -1) await getUsingRank(name.value);
+    else await theNeighborsKid(name.value);
+
+    parse.value = "Parse";
+    parse.disabled = false;
 }
 
 // credits link
