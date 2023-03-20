@@ -166,7 +166,6 @@ async function rankRange(text) {
             if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
             parseProfile(result.players[index - (page * 1000)], target);
             await addQueue();
-            await delay(500);
         }
     }
 }
