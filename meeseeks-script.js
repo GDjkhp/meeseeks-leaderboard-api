@@ -159,6 +159,7 @@ async function rankRange(text) {
     if (text.search("-") != -1) { 
         var left = text.split("-")[0];
         var right = text.split("-")[1];
+        queueLimit = Math.max(left, right);
         page = Math.min(left, right) / 1000 >> 0;
         await loadJSON(serverId);
         for (var index = Math.min(left, right)-1, target = 0; index < Math.max(left, right); index++, target++) {
@@ -170,13 +171,14 @@ async function rankRange(text) {
 }
 
 async function theNeighborsKid(bruh) {
-    if (bruh.search("-") == -1) {
+    if (bruh.search("-") == -1)
         parseProfile(await getPlayerByName(bruh, ""), 0);
-    } else await rankRange(bruh);
+    else await rankRange(bruh);
 }
 
 async function yourMom(pussy) {
-    if (pussy.toString().length == 18) parseProfile(await getPlayerById(pussy), 0);
+    if (pussy.toString().length == 18) 
+        parseProfile(await getPlayerById(pussy), 0);
     else await parseByRank(pussy);
 }
 
