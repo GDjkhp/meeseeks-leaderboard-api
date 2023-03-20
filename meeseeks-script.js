@@ -159,13 +159,14 @@ async function rankRange(text) {
     if (text.search("-") != -1) { 
         var left = text.split("-")[0];
         var right = text.split("-")[1];
-        queueLimit = Math.max(left, right);
+        queueLimit = Math.max(left, right); queue = Math.min(left, right)-1;
         page = Math.min(left, right) / 1000 >> 0;
         await loadJSON(serverId);
         for (var index = Math.min(left, right)-1, target = 0; index < Math.max(left, right); index++, target++) {
             if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
             parseProfile(result.players[index - (page * 1000)], target);
             await addQueue();
+            await delay(500);
         }
     }
 }
