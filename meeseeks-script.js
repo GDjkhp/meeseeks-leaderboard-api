@@ -1,4 +1,4 @@
-var result, page, serverId, queue, queueLimit;
+var result, page = 0, serverId, queue, queueLimit;
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
@@ -19,7 +19,7 @@ async function load(sel) {
     // minecraft: 302094807046684672
     // terraria: 251072485095636994
     // query: ?limit=1000&page=1
-    switch(sel.value) {
+    switch(sel) {
         case "gmd":
             serverId = "398627612299362304";
             await loadJSON(serverId);
@@ -120,6 +120,39 @@ async function getPlayerById(id) {
     else return null;
 }
 
+// blazingly fast player locator
+async function getUsingRank(text) {
+    if (text.split("#")[0] == "") { 
+        var rankMinus1 = text.split("#")[1]-1;
+        page = rankMinus1 / 1000 >> 0;
+        await loadJSON(serverId);
+        parseProfile(result.players[(rankMinus1%1000)], 0);
+    } else {
+        parseProfile(await getPlayerByName(text.split("#")[0], text.split("#")[1]), 0); // very accurate input cuz yes
+    }
+}
+
+// top rank range
+async function rankRange(text) {
+    if (text.search("-") != -1) { 
+        var left = text.split("-")[0];
+        var right = text.split("-")[1];
+
+        var min = Math.min(left, right)-1;
+        var max = Math.max(left, right);
+
+        queueLimit = max; queue = min;
+        page = min / 1000 >> 0;
+        console.log(page);
+        await loadJSON(serverId);
+        for (var index = min, target = 0; index < max; index++, target++) {
+            if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
+            parseProfile(result.players[index - (page * 1000)], target);
+            await addQueue();
+        }
+    }
+}
+
 // loose code to fetch nth page and status
 async function nextPage() {
     if (result.players.length != 0) {
@@ -140,34 +173,6 @@ async function addQueue() {
 // FIXME: only accepts 0-1000
 function randomPlayer() {
     return result.players[Math.floor(Math.random() * result.players.length)];
-}
-
-// blazingly fast player locator
-async function getUsingRank(text) { 
-    if (text.split("#")[0] == "") { 
-        var rankMinus1 = text.split("#")[1]-1;
-        page = rankMinus1 / 1000 >> 0;
-        await loadJSON(serverId);
-        parseProfile(result.players[(rankMinus1%1000)], 0);        
-    } else {
-        parseProfile(await getPlayerByName(text.split("#")[0], text.split("#")[1]), 0); // very accurate input cuz yes
-    }
-}
-
-// top rank range
-async function rankRange(text) {
-    if (text.search("-") != -1) { 
-        var left = text.split("-")[0];
-        var right = text.split("-")[1];
-        queueLimit = Math.max(left, right); queue = Math.min(left, right)-1;
-        page = Math.min(left, right) / 1000 >> 0;
-        await loadJSON(serverId);
-        for (var index = Math.min(left, right)-1, target = 0; index < Math.max(left, right); index++, target++) {
-            if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-            parseProfile(result.players[index - (page * 1000)], target);
-            await addQueue();
-        }
-    }
 }
 
 async function theNeighborsKid(bruh) {
@@ -194,7 +199,7 @@ async function parseServer() {
     page = 0; queue = 0; queueLimit = 0;
 
     //await loadId(id);
-    await load(sel);
+    await load(sel.value);
 
     if (!isNaN(name.value)) await yourMom(name.value);
     else if (name.value.search("#") != -1) await getUsingRank(name.value);
@@ -303,3 +308,17 @@ function destroyCards() {
         elements[0].parentNode.removeChild(elements[0]);
     }
 }
+
+async function tests() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+    //let value = params.some_key; // "some_value"
+    // let player = params.player; let server = params.server;
+    // console.log(server); console.log(player);
+
+    await load("gmd");
+    await getUsingRank("#10012");
+}
+//tests();
