@@ -1,4 +1,4 @@
-var result, page = 0, serverId, queue, queueLimit, previousQueue = null;
+var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false;
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
@@ -38,7 +38,7 @@ async function load(sel) {
 // returns a neat rank card
 async function parseProfile(player, target) {
     if (player == null) return;
-    addCard();
+    if (!update) addCard();
 
     const user = document.getElementsByClassName('realusername')[target];
     user.innerHTML = player.username;
@@ -65,7 +65,7 @@ async function parseProfile(player, target) {
     avatar.src = UrlExists("https://cdn.discordapp.com/avatars/" + player.id + "/" + player.avatar);
 
     const others = document.getElementsByClassName('otherstats')[target];
-    others.innerHTML = "Total XP: " + player.xp + ", Total msg: " + player.message_count + ", " + (player.message_count/1440 >> 0) + " days spent";
+    others.innerHTML = "Total XP: " + player.xp + ", Total msg: " + player.message_count + ", " + (player.message_count/1440 >> 0) + " day/s spent";
 
     const servericon = document.getElementsByClassName('serverpng')[target];
     servericon.src = "https://cdn.discordapp.com/icons/" + result.guild.id + "/" + result.guild.icon;
@@ -195,7 +195,8 @@ async function parseServer() {
     parse.value = "Parsing...";
     page = 0; queue = 0; queueLimit = 0;
     if (previousQueue != name.value) destroyCards();
-    else previousQueue = name.value;
+    else update = true;
+    previousQueue = name.value;
 
     //await loadId(id);
     await load(sel.value);
@@ -302,6 +303,7 @@ function addCard() {
 }
 
 function destroyCards() {
+    update = false;
     const elements = document.getElementsByClassName('rank-card');
     while(elements.length > 0) {
         elements[0].parentNode.removeChild(elements[0]);
@@ -316,8 +318,5 @@ async function tests() {
     //let value = params.some_key; // "some_value"
     // let player = params.player; let server = params.server;
     // console.log(server); console.log(player);
-
-    await load("gmd");
-    await getUsingRank("#10012");
 }
 //tests();
