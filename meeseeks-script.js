@@ -1,4 +1,4 @@
-var result, page = 0, serverId, queue, queueLimit;
+var result, page = 0, serverId, queue, queueLimit, previousQueue = null;
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
@@ -65,7 +65,7 @@ async function parseProfile(player, target) {
     avatar.src = UrlExists("https://cdn.discordapp.com/avatars/" + player.id + "/" + player.avatar);
 
     const others = document.getElementsByClassName('otherstats')[target];
-    others.innerHTML = "Total XP: " + player.xp + ", Total msg: " + player.message_count;
+    others.innerHTML = "Total XP: " + player.xp + ", Total msg: " + player.message_count + ", " + (player.message_count/1440 >> 0) + " days spent";
 
     const servericon = document.getElementsByClassName('serverpng')[target];
     servericon.src = "https://cdn.discordapp.com/icons/" + result.guild.id + "/" + result.guild.icon;
@@ -99,11 +99,11 @@ async function getPlayerByName(name, discriminator) {
     for(var i = 0; i < result.players.length; i++) {
         await addQueue();
         if (name == result.players[i].username) {
-            if (discriminator != "") return result.players[i];
+            if (discriminator == null) return result.players[i];
             else if (discriminator == result.players[i].discriminator) return result.players[i];
         }
     }
-    if (await nextPage()) return await getPlayerByName(name);
+    if (await nextPage()) return await getPlayerByName(name, discriminator);
     else return null;
 }
 
@@ -175,7 +175,7 @@ function randomPlayer() {
 
 async function theNeighborsKid(bruh) {
     if (bruh.search("-") == -1)
-        parseProfile(await getPlayerByName(bruh, ""), 0);
+        parseProfile(await getPlayerByName(bruh, null), 0);
     else await rankRange(bruh);
 }
 
@@ -193,8 +193,9 @@ async function parseServer() {
     var parse = document.getElementById('text');
 
     parse.value = "Parsing...";
-    destroyCards();
     page = 0; queue = 0; queueLimit = 0;
+    if (previousQueue == name.value) destroyCards();
+    else previousQueue = name.value;
 
     //await loadId(id);
     await load(sel.value);
