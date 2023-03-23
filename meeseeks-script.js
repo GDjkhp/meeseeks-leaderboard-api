@@ -98,12 +98,10 @@ async function getPlayerByName(name, discriminator) {
     queueLimit += 1000;
     for(var i = 0; i < result.players.length; i++) {
         await addQueue();
-        if (discriminator != "") {
-            if (name == result.players[i].username && 
-                discriminator == result.players[i].discriminator) 
-                return result.players[i];
+        if (name == result.players[i].username) {
+            if (discriminator != "") return result.players[i];
+            else if (discriminator == result.players[i].discriminator) return result.players[i];
         }
-        else if (name == result.players[i].username) return result.players[i];
     }
     if (await nextPage()) return await getPlayerByName(name);
     else return null;
