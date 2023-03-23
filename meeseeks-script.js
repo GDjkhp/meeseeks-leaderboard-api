@@ -194,7 +194,7 @@ async function parseServer() {
 
     parse.value = "Parsing...";
     page = 0; queue = 0; queueLimit = 0;
-    if (previousQueue == name.value) destroyCards();
+    if (previousQueue != name.value) destroyCards();
     else previousQueue = name.value;
 
     //await loadId(id);
