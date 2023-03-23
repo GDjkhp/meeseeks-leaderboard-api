@@ -141,7 +141,6 @@ async function rankRange(text) {
 
         queueLimit = max; queue = min;
         page = min / 1000 >> 0;
-        console.log(page);
         await loadJSON(serverId);
         for (var index = min, target = 0; index < max; index++, target++) {
             if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
@@ -174,7 +173,7 @@ function randomPlayer() {
 }
 
 async function theNeighborsKid(bruh) {
-    if (bruh.search("-") == -1)
+    if (bruh.search("-") == -1 || isNaN(bruh.split("-")[0]))
         parseProfile(await getPlayerByName(bruh, null), 0);
     else await rankRange(bruh);
 }
