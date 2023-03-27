@@ -65,13 +65,24 @@ async function parseProfile(player, target) {
     avatar.src = UrlExists("https://cdn.discordapp.com/avatars/" + player.id + "/" + player.avatar);
 
     const others = document.getElementsByClassName('otherstats')[target];
-    others.innerHTML = "Total XP: " + player.xp + ", Total msg: " + player.message_count + ", " + (player.message_count/1440 >> 0) + " day/s spent";
-
+    others.innerHTML = "Total XP: " + player.xp + 
+        ", Total msg: " + player.message_count + 
+        ", Time spent: " + getTime(player.message_count);
+    
     const servericon = document.getElementsByClassName('serverpng')[target];
     servericon.src = "https://cdn.discordapp.com/icons/" + result.guild.id + "/" + result.guild.icon;
 
     const servername = document.getElementsByClassName('servername')[target];
     servername.innerHTML = result.guild.name;
+}
+
+// pink floyd - time
+function getTime(time) {
+    return checkZero((time/1440 >> 0)) + ":" + checkZero((time/60) % 24 >> 0) + ":" + checkZero(time%60) + ":00";
+}
+function checkZero(time) {
+    if (time < 10) {time = "0" + time};  // add zero in front of numbers < 10
+    return time;
 }
 
 // returns player rank
