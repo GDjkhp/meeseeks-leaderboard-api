@@ -90,7 +90,7 @@ async function getRank(player) {
     for(var i = 0; i < result.players.length; i++) {
         if (player.username == result.players[i].username) return page * 1000 + i + 1;
     }
-    if (await nextPage()) return await getRank(player); 
+    if (await nextPage()) return await getRank(player);
     else return null;
 }
 
@@ -208,14 +208,19 @@ async function parseServer() {
     else update = true;
     previousQueue = name.value;
 
-    //await loadId(id);
-    await load(sel.value);
+    try {
+        //await loadId(id);
+        await load(sel.value);
 
-    if (!isNaN(name.value)) await yourMom(name.value);
-    else if (name.value.search("#") != -1) await getUsingRank(name.value);
-    else await theNeighborsKid(name.value);
+        if (!isNaN(name.value)) await yourMom(name.value);
+        else if (name.value.search("#") != -1) await getUsingRank(name.value);
+        else await theNeighborsKid(name.value);
 
-    parse.value = "Parse";
+        parse.value = "Parse";
+    } catch (error) {
+        console.log(error);
+        parse.value = "Retry";
+    }
     parse.disabled = false;
 }
 
