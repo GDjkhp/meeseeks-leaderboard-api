@@ -190,7 +190,7 @@ async function theNeighborsKid(bruh) {
 }
 
 async function yourMom(pussy) {
-    if (pussy.toString().length == 18) 
+    if (pussy.toString().length >= 18) // Shobii bug
         parseProfile(await getPlayerById(pussy), 0);
     else await parseByRank(pussy);
 }
