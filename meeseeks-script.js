@@ -47,7 +47,7 @@ async function parseProfile(player, target) {
     discordtag.innerHTML = "#" + player.discriminator;
 
     const rank = document.getElementsByClassName('rank-number')[target];
-    rank.innerHTML = "#" + await getRank(player);
+    rank.innerHTML = "#" + getRank(player);
 
     const level = document.getElementsByClassName('level-number')[target];
     level.innerHTML = player.level;
@@ -80,13 +80,11 @@ async function parseProfile(player, target) {
 }
 
 // returns player rank
-async function getRank(player) {
+function getRank(player) {
     for(var i = 0; i < result.players.length; i++) {
         if (player.username == result.players[i].username) return page * 1000 + i + 1;
     }
-    // confusion 100, no need to be async
-    if (await nextPage()) return await getRank(player);
-    else return null;
+    return null;
 }
 
 // parse nth ranked player
@@ -198,7 +196,7 @@ async function parseServer() {
     var parse = document.getElementById('text');
 
     parse.value = "Parsing...";
-    parse.disabled = true; turing = false; stop1.disabled = false;
+    parse.disabled = true; turing = false;
     page = 0; queue = 0; queueLimit = 0;
     if (previousQueue != name.value) destroyCards();
     else update = true;
@@ -207,7 +205,7 @@ async function parseServer() {
     try {
         //await loadId(id);
         await load(sel.value);
-
+        stop1.disabled = false;
         if (!isNaN(name.value)) await yourMom(name.value);
         else if (name.value.search("#") != -1) await getUsingRank(name.value);
         else await theNeighborsKid(name.value);
