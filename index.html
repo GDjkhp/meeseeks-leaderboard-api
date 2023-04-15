@@ -63,11 +63,19 @@
             overflow: hidden;
             display: flex;
             justify-content: flex-start;
+            position: relative; /* Add this */
         }
 
         .progress-bar {
             background-color: var(--primary-color);
             height: 100%;
+        }
+
+        .progress-percent {
+            position: absolute; /* Add this */
+            margin-left: 340px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	        font-weight: bold;
         }
 
         .progress-label {
@@ -165,12 +173,6 @@
             border: white solid 1px;
             padding: 5px;
         }
-        .progress-percent {
-            margin-left: auto;
-            margin-right: 5px;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-	        font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -191,6 +193,7 @@
         <input type="text" value="" id="name">
 
         <input type="button" value="Parse" id="text" onclick="parseServer();">
+        <input type="button" value="X" id="stop" onclick="halt();">
         <!-- <br><br> -->
         <!-- <input type="button" value="Refresh" onclick="refresh();"> -->
     </div>
@@ -221,6 +224,7 @@
             </tr>
         </table>
         <!-- test your card designs here -->
+        <!-- end -->
         <span>Nothing is logged or stored in the server. All fetched data are publicly available in:</span>
         <br>
         <a id="link"></a>

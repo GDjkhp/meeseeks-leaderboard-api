@@ -1,4 +1,4 @@
-var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false;
+var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false;
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
@@ -91,7 +91,7 @@ async function getRank(player) {
 // parse nth ranked player
 async function parseByRank(number) {
     queueLimit = number;
-    for(var index = 0; index < number; index++) {
+    for(var index = 0; index < number && !turing; index++) {
         if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
         parseProfile(result.players[index - (page * 1000)], index);
         await addQueue();
@@ -101,7 +101,7 @@ async function parseByRank(number) {
 // returns player by searching username
 async function getPlayerByName(name, discriminator) {
     queueLimit += 1000;
-    for(var i = 0; i < result.players.length; i++) {
+    for(var i = 0; i < result.players.length && !turing; i++) {
         await addQueue();
         if (name == result.players[i].username) {
             if (discriminator == null) return result.players[i];
@@ -115,7 +115,7 @@ async function getPlayerByName(name, discriminator) {
 // returns player by searching user id
 async function getPlayerById(id) {
     queueLimit += 1000;
-    for(var i = 0; i < result.players.length; i++) {
+    for(var i = 0; i < result.players.length && !turing; i++) {
         await addQueue();
         if (id == result.players[i].id) return result.players[i];
     }
@@ -147,7 +147,7 @@ async function rankRange(text) {
         queueLimit = max; queue = min;
         page = min / 1000 >> 0;
         await loadJSON(serverId);
-        for (var index = min, target = 0; index < max; index++, target++) {
+        for (var index = min, target = 0; index < max && !turing; index++, target++) {
             if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
             parseProfile(result.players[index - (page * 1000)], target);
             await addQueue();
@@ -197,7 +197,7 @@ async function parseServer() {
     var parse = document.getElementById('text');
 
     parse.value = "Parsing...";
-    parse.disabled = true;
+    parse.disabled = true; turing = false; stop1.disabled = false;
     page = 0; queue = 0; queueLimit = 0;
     if (previousQueue != name.value) destroyCards();
     else update = true;
@@ -216,7 +216,19 @@ async function parseServer() {
         console.log(error);
         parse.value = "Retry";
     }
-    parse.disabled = false;
+    parse.disabled = false; stop1.disabled = true;
+}
+
+// halt
+var stop1 = document.getElementById('stop');
+stop1.disabled = true;
+function halt() {
+    turing = true;
+
+    const confirm = document.getElementById('text');
+    confirm.disabled = false;
+
+    stop1.disabled = true;
 }
 
 // enter for pc peeps
