@@ -2,7 +2,7 @@ var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update 
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
-    result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
+    if (!turing) result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
     await delay(500);
 }
@@ -84,6 +84,7 @@ async function getRank(player) {
     for(var i = 0; i < result.players.length; i++) {
         if (player.username == result.players[i].username) return page * 1000 + i + 1;
     }
+    // confusion 100, no need to be async
     if (await nextPage()) return await getRank(player);
     else return null;
 }
