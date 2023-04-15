@@ -165,6 +165,12 @@
             border: white solid 1px;
             padding: 5px;
         }
+        .progress-percent {
+            margin-left: auto;
+            margin-right: 5px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	        font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -184,7 +190,7 @@
         <!-- <input type="text" value="" id="serverId"> -->
         <input type="text" value="" id="name">
 
-        <input type="button" value="Parse" id="text" onclick="parseServer(); this.disabled=true;">
+        <input type="button" value="Parse" id="text" onclick="parseServer();">
         <!-- <br><br> -->
         <!-- <input type="button" value="Refresh" onclick="refresh();"> -->
     </div>
@@ -214,6 +220,7 @@
                 <td>returns top player cards</td>
             </tr>
         </table>
+        <!-- test your card designs here -->
         <span>Nothing is logged or stored in the server. All fetched data are publicly available in:</span>
         <br>
         <a id="link"></a>

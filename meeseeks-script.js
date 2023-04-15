@@ -74,15 +74,9 @@ async function parseProfile(player, target) {
 
     const servername = document.getElementsByClassName('servername')[target];
     servername.innerHTML = result.guild.name;
-}
 
-// pink floyd - time
-function getTime(time) {
-    return checkZero((time/1440 >> 0)) + ":" + checkZero((time/60) % 24 >> 0) + ":" + checkZero(time%60) + ":00";
-}
-function checkZero(time) {
-    if (time < 10) {time = "0" + time};  // add zero in front of numbers < 10
-    return time;
+    const percent = document.getElementsByClassName('progress-percent')[target];
+    percent.innerHTML = (round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)) + "%";
 }
 
 // returns player rank
@@ -203,6 +197,7 @@ async function parseServer() {
     var parse = document.getElementById('text');
 
     parse.value = "Parsing...";
+    parse.disabled = true;
     page = 0; queue = 0; queueLimit = 0;
     if (previousQueue != name.value) destroyCards();
     else update = true;
@@ -223,6 +218,15 @@ async function parseServer() {
     }
     parse.disabled = false;
 }
+
+// enter for pc peeps
+const node = document.getElementById('name');
+node.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        const confirm = document.getElementById('text');
+        if (!confirm.disabled) parseServer();
+    }
+});
 
 // credits link
 currentlink = "";
@@ -254,6 +258,20 @@ function setLink(fuck, shit) {
 setInterval(randomLink, 500);
 
 // utils
+function round(num, places) {
+    var multiplier = Math.pow(10, places);
+    return Math.round(num * multiplier) / multiplier;
+}
+
+function getTime(time) {
+    // pink floyd - time
+    return checkZero((time/1440 >> 0)) + ":" + checkZero((time/60) % 24 >> 0) + ":" + checkZero(time%60) + ":00";
+}
+function checkZero(time) {
+    if (time < 10) {time = "0" + time};  // add zero in front of numbers < 10
+    return time;
+}
+
 function delay(ms) {
 	return new Promise((resolve, reject) => {
 		setTimeout(resolve, ms);
@@ -299,6 +317,7 @@ function addCard() {
 
                 <div class="progress">
                     <div class="progress-bar" style="width: 50%;"></div>
+                    <span class="progress-percent"></span>
                 </div>
 
                 <div class="footergroup">
