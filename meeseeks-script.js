@@ -2,9 +2,12 @@ var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update 
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
-    if (!turing) result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
-    console.log(result);
-    await delay(500);
+    if (!turing) {
+        // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
+        result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+        console.log(result);
+        await delay(500);
+    }
 }
 
 // TODO: load using server id
@@ -156,6 +159,7 @@ async function rankRange(text) {
 
 // loose code to fetch nth page and status
 async function nextPage() {
+    if (turing) return false;
     if (result.players.length != 0) {
         page++;
         await loadJSON(serverId);
