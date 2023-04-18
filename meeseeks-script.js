@@ -43,44 +43,49 @@ async function load(sel) {
 async function parseProfile(player, target) {
     if (player == null) return;
     if (!update) addCard();
+    var color = getRoleColor(player.level);
 
     const user = document.getElementsByClassName('realusername')[target];
     user.innerHTML = player.username;
+    user.style = `font-size: 24px; font-weight: bold; color: ${color};`;
 
     const discordtag = document.getElementsByClassName('discriminator')[target];
-    discordtag.innerHTML = "#" + player.discriminator;
+    discordtag.innerHTML = `#${player.discriminator}`;
 
     const rank = document.getElementsByClassName('rank-number')[target];
-    rank.innerHTML = "#" + getRank(player);
+    rank.innerHTML = `#${getRank(player)}`;
 
     const level = document.getElementsByClassName('level-number')[target];
     level.innerHTML = player.level;
+    level.style = `font-size: 32px; font-weight: bold; color: ${color};`;
+
+    const level1 = document.getElementsByClassName('level')[target];
+    level1.style = `font-size: 16px; color: ${color};`;
 
     const xp = document.getElementsByClassName('progress-label-current')[target];
     xp.innerHTML = player.detailed_xp[0];
 
     const xp2= document.getElementsByClassName('progress-label-limit')[target];
-    xp2.innerHTML = " / " + player.detailed_xp[1] + " XP";
+    xp2.innerHTML = ` / ${player.detailed_xp[1]} XP`;
 
     const bar = document.getElementsByClassName('progress-bar')[target];
-    bar.style = "width: " + ((player.detailed_xp[0]/player.detailed_xp[1])*100) + "%;";
+    bar.style = `width: ${((player.detailed_xp[0]/player.detailed_xp[1])*100)}%; background-color: ${color};`;
 
     const avatar = document.getElementsByClassName('avatar')[target];
-    avatar.src = UrlExists("https://cdn.discordapp.com/avatars/" + player.id + "/" + player.avatar);
+    const url = `https://cdn.discordapp.com/avatars/${player.id}/${player.avatar}`;
+    avatar.src = player.avatar != "" && UrlExists(url) ? url : "https://gdjkhp.github.io/img/dc.png";
 
     const others = document.getElementsByClassName('otherstats')[target];
-    others.innerHTML = "Total XP: " + player.xp + 
-        ", Total msg: " + player.message_count + 
-        ", Time spent: " + getTime(player.message_count);
+    others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
     
     const servericon = document.getElementsByClassName('serverpng')[target];
-    servericon.src = "https://cdn.discordapp.com/icons/" + result.guild.id + "/" + result.guild.icon;
+    servericon.src = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
 
     const servername = document.getElementsByClassName('servername')[target];
     servername.innerHTML = result.guild.name;
 
     const percent = document.getElementsByClassName('progress-percent')[target];
-    percent.innerHTML = (round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)) + "%";
+    percent.innerHTML = `${round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)}%`;
 }
 
 // returns player rank
@@ -274,6 +279,22 @@ function setLink(fuck, shit) {
 setInterval(randomLink, 500);
 
 // utils
+function getRoleColor(level) {
+    const roles_rewards = result.role_rewards;
+    for (let i = roles_rewards.length - 1; i >= 0; i--) {
+        const element = roles_rewards[i];
+        if (element.rank <= level) return base16(element.role.color);
+    }
+    return "white";
+}
+function base16(num) {
+    let hex = num.toString(16);
+    while (hex.length < 6) {
+        hex = "0" + hex;
+    }
+    return hex;
+}
+
 function round(num, places) {
     var multiplier = Math.pow(10, places);
     return Math.round(num * multiplier) / multiplier;
@@ -299,9 +320,8 @@ function UrlExists(url) {
     http.open('HEAD', url, false);
     http.send();
     if (http.status != 404) 
-        return url;
-    else
-        return "https://gdjkhp.github.io/img/dc.png";
+        return true;
+    return false;
 }
 
 // card utils
@@ -309,7 +329,7 @@ function addCard() {
     const rankCardHtml = `
         <div class="rank-card">
             <div class="rank-card-avatar">
-                <img class="avatar" src="https://gdjkhp.github.io/img/dc.png">
+                <img class="avatar">
             </div>
 
             <div class="info">
@@ -332,7 +352,7 @@ function addCard() {
                 </div>
 
                 <div class="progress">
-                    <div class="progress-bar" style="width: 50%;"></div>
+                    <div class="progress-bar"></div>
                     <span class="progress-percent"></span>
                 </div>
 
