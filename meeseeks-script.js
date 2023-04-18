@@ -4,7 +4,8 @@ var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update 
 async function loadJSON(id) {
     if (!turing) {
         // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
-        result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+        // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+        result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
         console.log(result);
         await delay(500);
     }
