@@ -240,6 +240,12 @@ function halt() {
     stop1.disabled = true;
 }
 
+// details
+const group = document.getElementsByClassName('foot')[0];
+function details() {
+    group.style.display = group.style.display != "none" ? "none" : "block";
+}
+
 // enter for pc peeps
 const node = document.getElementById('name');
 node.addEventListener("keyup", function(event) {
