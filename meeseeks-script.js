@@ -2,13 +2,12 @@ var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update 
 
 // cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
 async function loadJSON(id) {
-    if (!turing) {
-        // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
-        // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
-        result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
-        console.log(result);
-        await delay(500);
-    }
+    if (turing) return;
+    // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
+    // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+    result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+    console.log(result);
+    await delay(500);
 }
 
 // TODO: load using server id
@@ -42,7 +41,7 @@ async function load(sel) {
 // returns a neat rank card
 async function parseProfile(player, target) {
     if (player == null) return;
-    if (!update) addCard();
+    if (!update || document.getElementsByClassName('rank-card')[target] == null) addCard();
     var color = getRoleColor(player.level);
 
     const user = document.getElementsByClassName('realusername')[target];
@@ -198,6 +197,26 @@ async function yourMom(pussy) {
     else await parseByRank(pussy);
 }
 
+// 60 second countdown
+const timerEl = document.getElementById('timer');
+let endTime, timerId;
+function countdown() {
+    // Calculate time difference between now and end time
+    const timeDiff = endTime - new Date();
+    // Format time display as "MM:SS:MS"
+    const minutes = String(Math.floor(timeDiff / 60000)).padStart(2, '0');
+    const seconds = String(Math.floor((timeDiff % 60000) / 1000)).padStart(2, '0');
+    const milliseconds = String(Math.floor((timeDiff % 1000) / 10)).padStart(2, '0');
+    const displayTime = `${minutes}:${seconds}.${milliseconds}`;
+    // Update timer display
+    timerEl.innerText = displayTime;
+    // Stop the countdown when timeLeft reaches 0
+    if (timeDiff <= 0) {
+        clearInterval(timerId);
+        timerEl.innerText = "00:00.00";
+    }
+}
+
 // main function (fetch button)
 async function parseServer() {
     //var id = document.getElementById('serverId');
@@ -212,6 +231,10 @@ async function parseServer() {
     else update = true;
     previousQueue = name.value;
 
+    endTime = new Date(Date.now() + 60 * 1000);
+    clearInterval(timerId);
+    timerId = setInterval(countdown, 1);
+
     try {
         //await loadId(id);
         await load(sel.value);
@@ -219,7 +242,6 @@ async function parseServer() {
         if (!isNaN(name.value)) await yourMom(name.value);
         else if (name.value.search("#") != -1) await getUsingRank(name.value);
         else await theNeighborsKid(name.value);
-
         parse.value = "Parse";
     } catch (error) {
         console.log(error);
@@ -227,6 +249,19 @@ async function parseServer() {
     }
     parse.disabled = false; stop1.disabled = true;
 }
+
+// server status
+function pingpong() {
+    const ping = document.getElementById('status');
+    if (UrlExists(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/398627612299362304`)) {
+        ping.innerHTML = "Online";
+        ping.style = "font-weight: bold; color: lime;";
+    } else {
+        ping.innerHTML = "Offline";
+        ping.style = "font-weight: bold; color: red;";
+    }
+}
+pingpong();
 
 // halt
 var stop1 = document.getElementById('stop');
@@ -308,7 +343,7 @@ function round(num, places) {
 
 function getTime(time) {
     // pink floyd - time
-    return checkZero((time/1440 >> 0)) + ":" + checkZero((time/60) % 24 >> 0) + ":" + checkZero(time%60) + ":00";
+    return `${checkZero((time/1440 >> 0))}:${checkZero((time/60) % 24 >> 0)}:${checkZero(time%60)}:00`;
 }
 function checkZero(time) {
     if (time < 10) {time = "0" + time};  // add zero in front of numbers < 10
