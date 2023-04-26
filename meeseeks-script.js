@@ -300,7 +300,7 @@ function randomPlayer() {
 // if input is a string/number
 async function theNeighborsKid(bruh) {
     if (bruh.search(",") != -1) await multipleSearch(bruh);
-    else if (buffer.search("#") != -1) await getUsingRank(buffer);
+    else if (bruh.search("#") != -1) await getUsingRank(bruh);
     else if (bruh.search("-") == -1 || isNaN(bruh.split("-")[0])) // fc-clint bug
         parseProfile(await getPlayerByName(bruh, null), 0);
     else await rankRange(bruh);
@@ -424,8 +424,9 @@ function details() {
 
 // enter for pc peeps
 const node = document.getElementById('name');
-node.addEventListener("keyup", function(event) {
+node.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
+        event.preventDefault();
         const confirm = document.getElementById('text');
         if (!confirm.disabled) parse();
     }
