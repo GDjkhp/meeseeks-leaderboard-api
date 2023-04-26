@@ -187,21 +187,26 @@ async function multipleSearch(text) {
     var spl = text.search(", ") != -1 ? ", " : ","; // bad
     var query = text.split(spl);
     console.log(query);
-    var index1 = 0, lengthMinus1 = query.length - 1;
+    var index1 = 0;
 
-    // blazingly fast algorithm
+    // rank
+    lengthMinus1 = query.length - 1;
     while(lengthMinus1 >= 0) {
-        if (query[lengthMinus1].search("#") != -1 && query[lengthMinus1].split("#")[0] == "") {
-            var rankMinus1 = query[lengthMinus1].split("#")[1]-1;
-            page = rankMinus1 / 1000 >> 0;
+        if (isFinite(query[lengthMinus1]) && !(query[lengthMinus1].toString().length >= 18)) {
+            queue = 0; page = 0;
             await loadJSON(serverId);
-            parseProfile(result.players[(rankMinus1%1000)], index1);
-            index1++;
+            queueLimit = query[lengthMinus1];
+            for(var index = 0; index < query[lengthMinus1] && !turing; index++) {
+                if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
+                parseProfile(result.players[index - (page * 1000)], index1);
+                index1++;
+                await addQueue();
+            }
             console.log(query.splice(lengthMinus1, 1));
         }
         lengthMinus1--;
     }
-    console.log("blazingly fast algorithm done");
+    console.log("rank done");
 
     // rank range
     lengthMinus1 = query.length - 1;
@@ -228,25 +233,20 @@ async function multipleSearch(text) {
     }
     console.log("rank range done");
 
-    // rank
+    // blazingly fast algorithm
     lengthMinus1 = query.length - 1;
-    queue = 0; queueLimit = 0;
     while(lengthMinus1 >= 0) {
-        if (isFinite(query[lengthMinus1]) && !(query[lengthMinus1].toString().length >= 18)) {
-            page = 0;
+        if (query[lengthMinus1].search("#") != -1 && query[lengthMinus1].split("#")[0] == "") {
+            var rankMinus1 = query[lengthMinus1].split("#")[1]-1;
+            page = rankMinus1 / 1000 >> 0;
             await loadJSON(serverId);
-            queueLimit = query[lengthMinus1];
-            for(var index = 0; index < query[lengthMinus1] && !turing; index++) {
-                if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-                parseProfile(result.players[index - (page * 1000)], index1);
-                index1++;
-                await addQueue();
-            }
+            parseProfile(result.players[(rankMinus1%1000)], index1);
+            index1++;
             console.log(query.splice(lengthMinus1, 1));
         }
         lengthMinus1--;
     }
-    console.log("rank done");
+    console.log("blazingly fast algorithm done");
 
     // search by id or name
     for (const element of query) {
