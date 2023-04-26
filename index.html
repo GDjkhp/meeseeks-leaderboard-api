@@ -48,11 +48,11 @@
             background-color: var(--secondary-color);
             border-radius: 10px;
             height: 20px;
-            margin-bottom: 1px;
             overflow: hidden;
             display: flex;
             justify-content: flex-start;
             position: relative; /* Add this */
+            z-index: 2;
         }
         .progress-bar {
             background-color: var(--primary-color);
@@ -61,8 +61,31 @@
         .progress-percent {
             position: absolute; /* Add this */
             right: 1%;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 	        font-weight: bold;
+        }
+        .progress2 {
+            background-color: var(--secondary-color);
+            border-radius: 0px 0px 5px 5px;
+            height: 10px;
+            margin-bottom: 1px;
+            overflow: hidden;
+            display: flex;
+            justify-content: flex-start;
+            position: relative; /* Add this */
+            width: 98%;
+            margin: -2px auto 1px auto;
+            z-index: 1;
+        }
+        .progress-bar2 {
+            background-color: var(--primary-color);
+            height: 100%;
+        }
+        .progress-percent2 {
+            position: absolute; /* Add this */
+            right: 1%;
+	        font-weight: bold;
+            font-size: 8px;
+            margin-top: 1px;
         }
         .progress-label {
             font-size: 16px;
@@ -84,6 +107,12 @@
         .usernamegroup {
             display: flex;
             justify-content: space-between;
+        }
+        .usernamegroup a {
+            text-decoration: none;
+        }
+        .usernamegroup a:hover {
+            text-decoration: underline;
         }
         .discriminator {
             font-size: 16px;
@@ -128,7 +157,7 @@
             left: 50%;
             transform: translate(-50%);
             background-color: #000;
-            z-index: 1;
+            z-index: 3;
             border: white dashed 3px;
             padding: 10px;
         }
@@ -160,20 +189,28 @@
         <br>
         <span>by gdjkhp</span>
         <br>
+        <a href="https://count.getloli.com/">
+            <img src="https://count.getloli.com/get/@:GDjkhp-mee6?theme=rule34">
+        </a>
         <br>
-        <!-- <input type="text" value="" id="serverId"> -->
         <select value="" id="serverIdSelect">
             <option value="gmd">GeometryDash</option>
             <option value="mc">Minecraft</option>
             <option value="tml">Terraria</option>
+            <option value="id">Other</option>
         </select>
-        <input type="text" value="" id="name">
-        <input type="button" value="Parse" id="text" onclick="parseServer();">
+        <br>
+        <input type="text" value="" id="serverId" disabled>
+        <br>
+        <br>
+        <textarea value="" id="name"></textarea>
+        <br>
+        <input type="button" value="Parse" id="text" onclick="parse();">
         <input type="button" value="X" id="stop" onclick="halt();">
         <input type="button" value="?" onclick="details();">
         <br>
         <span id="timer" style="font-weight: bold;">01:00.00</span>
-        <div class="foot" style="display: none;">
+        <div id="foot" style="display: none;">
             <br>
             <table class="params">
                 <tr>
@@ -209,11 +246,10 @@
             <div style="display: flex; justify-content: space-evenly;">
                 <div>
                     <span>status: </span>
-                    <span id="status">pinging</span>
+                    <span id="status">pinging...</span>
                     <span> / </span>
                     <a target="_blank" href="https://gdjkhp.github.io/">report</a>
                 </div>
-
                 <div>
                     <span>source code: </span>
                     <a target="_blank" href="https://github.com/GDjkhp/meeseeks-leaderboard-api"><img width="16" src="https://gdjkhp.github.io/img/git.png"></a>
@@ -223,7 +259,7 @@
             </div>
         </div>
     </div>
-    <div style="height: 25%;">
+    <div style="height: 50%;">
         <!-- <p>hello darkness my old friend</p> -->
     </div>
     <script src="meeseeks-script.js"></script>

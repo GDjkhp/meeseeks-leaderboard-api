@@ -1,42 +1,42 @@
-var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false;
+var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP;
 
-// cors unblocked api server, please don't abuse (rate limited, ip banned), delays 500ms
+// cors unblocked api server, please don't abuse (rate limited, can ban my server's ip address), delays 500ms
 async function loadJSON(id) {
     if (turing) return;
     // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
+    if (page == 0) topXP = result.players[0].xp;
     await delay(500);
 }
 
-// TODO: load using server id
-async function loadId(id) {
-    serverId = id;
-    await loadJSON(id);
-}
-
-// load pre defined servers
-async function load(sel) {
+// load custom server id + pre defined servers
+function load(sel) {
+    if (isFinite(sel)) return serverId = sel;
     // geometrydash: 398627612299362304
     // minecraft: 302094807046684672
     // terraria: 251072485095636994
     // query: ?limit=1000&page=1
     switch(sel) {
         case "gmd":
-            serverId = "398627612299362304";
-            await loadJSON(serverId);
-            break;
+            return "398627612299362304";
         case "mc":
-            serverId = "302094807046684672";
-            await loadJSON(serverId);
-            break;
+            return "302094807046684672";
         case "tml":
-            serverId = "251072485095636994";
-            await loadJSON(serverId);
-            break;
+            return "251072485095636994";
     }
+    return "";
 }
+
+// server id support
+const serverSelect = document.getElementById('serverIdSelect');
+const serverBox = document.getElementById('serverId');
+serverBox.value = load(serverSelect.value);
+serverSelect.addEventListener('change', () => {
+    serverSelect.value != 'id' ? serverBox.disabled = true : serverBox.disabled = false;
+    serverBox.value = load(serverSelect.value);
+});
 
 // returns a neat rank card
 async function parseProfile(player, target) {
@@ -78,13 +78,33 @@ async function parseProfile(player, target) {
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
     
     const servericon = document.getElementsByClassName('serverpng')[target];
-    servericon.src = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
+    const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
+    servericon.src = UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
 
     const servername = document.getElementsByClassName('servername')[target];
     servername.innerHTML = result.guild.name;
 
     const percent = document.getElementsByClassName('progress-percent')[target];
     percent.innerHTML = `${round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)}%`;
+
+    const percent2 = document.getElementsByClassName('progress-percent2')[target];
+    percent2.innerHTML = `${round(player.xp / topXP * 100, 2)}%`;
+
+    const bar2 = document.getElementsByClassName('progress-bar2')[target];
+    bar2.style = `width: ${player.xp / topXP * 100}%;`;
+
+    const a = document.createElement("a");
+    a.href = `https://discord.com/users/${player.id}`;
+    a.target = "discord";
+    avatar.parentNode.insertBefore(a, avatar);
+    a.appendChild(avatar);
+
+    const a2 = document.createElement("a");
+    a2.href = `https://discord.com/users/${player.id}`;
+    a2.target = "discord";
+    const usernamegroup = document.getElementsByClassName('username')[target];
+    usernamegroup.parentNode.insertBefore(a2, usernamegroup);
+    a2.appendChild(usernamegroup);
 }
 
 // returns player rank
@@ -107,7 +127,7 @@ async function parseByRank(number) {
 
 // returns player by searching username
 async function getPlayerByName(name, discriminator) {
-    queueLimit += 1000;
+    queueLimit += result.players.length;
     for(var i = 0; i < result.players.length && !turing; i++) {
         await addQueue();
         if (name == result.players[i].username) {
@@ -121,7 +141,7 @@ async function getPlayerByName(name, discriminator) {
 
 // returns player by searching user id
 async function getPlayerById(id) {
-    queueLimit += 1000;
+    queueLimit += result.players.length;
     for(var i = 0; i < result.players.length && !turing; i++) {
         await addQueue();
         if (id == result.players[i].id) return result.players[i];
@@ -135,7 +155,7 @@ async function getUsingRank(text) {
     if (text.split("#")[0] == "") { 
         var rankMinus1 = text.split("#")[1]-1;
         page = rankMinus1 / 1000 >> 0;
-        await loadJSON(serverId);
+        if (page != 0) await loadJSON(serverId);
         parseProfile(result.players[(rankMinus1%1000)], 0);
     } else {
         parseProfile(await getPlayerByName(text.split("#")[0], text.split("#")[1]), 0); // very accurate input cuz yes
@@ -153,13 +173,105 @@ async function rankRange(text) {
 
         queueLimit = max; queue = min;
         page = min / 1000 >> 0;
-        await loadJSON(serverId);
+        if (page != 0) await loadJSON(serverId);
         for (var index = min, target = 0; index < max && !turing; index++, target++) {
             if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
             parseProfile(result.players[index - (page * 1000)], target);
             await addQueue();
         }
     }
+}
+
+// split the search using commas
+async function multipleSearch(text) {
+    var spl = text.search(", ") != -1 ? ", " : ","; // bad
+    var query = text.split(spl);
+    console.log(query);
+    var index1 = 0, lengthMinus1 = query.length - 1;
+
+    // blazingly fast algorithm
+    while(lengthMinus1 >= 0) {
+        if (query[lengthMinus1].search("#") != -1 && query[lengthMinus1].split("#")[0] == "") {
+            var rankMinus1 = query[lengthMinus1].split("#")[1]-1;
+            page = rankMinus1 / 1000 >> 0;
+            await loadJSON(serverId);
+            parseProfile(result.players[(rankMinus1%1000)], index1);
+            index1++;
+            console.log(query.splice(lengthMinus1, 1));
+        }
+        lengthMinus1--;
+    }
+    console.log("blazingly fast algorithm done");
+
+    // rank range
+    lengthMinus1 = query.length - 1;
+    while(lengthMinus1 >= 0) {
+        if (query[lengthMinus1].search("-") != -1 && isFinite(query[lengthMinus1].split("-")[0])) {
+            var left = query[lengthMinus1].split("-")[0];
+            var right = query[lengthMinus1].split("-")[1];
+    
+            var min = Math.min(left, right)-1;
+            var max = Math.max(left, right);
+    
+            queueLimit = max; queue = min;
+            page = min / 1000 >> 0;
+            await loadJSON(serverId);
+            for (var index = min; index < max && !turing; index++) {
+                if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
+                parseProfile(result.players[index - (page * 1000)], index1);
+                index1++;
+                await addQueue();
+            }
+            console.log(query.splice(lengthMinus1, 1));
+        }
+        lengthMinus1--;
+    }
+    console.log("rank range done");
+
+    // rank
+    lengthMinus1 = query.length - 1;
+    queue = 0; queueLimit = 0;
+    while(lengthMinus1 >= 0) {
+        if (isFinite(query[lengthMinus1]) && !(query[lengthMinus1].toString().length >= 18)) {
+            page = 0;
+            await loadJSON(serverId);
+            queueLimit = query[lengthMinus1];
+            for(var index = 0; index < query[lengthMinus1] && !turing; index++) {
+                if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
+                parseProfile(result.players[index - (page * 1000)], index1);
+                index1++;
+                await addQueue();
+            }
+            console.log(query.splice(lengthMinus1, 1));
+        }
+        lengthMinus1--;
+    }
+    console.log("rank done");
+
+    // search by id or name
+    for (const element of query) {
+        queue = 0; queueLimit = 0;
+        if (element.toString().length >= 18) {
+            page = 0;
+            await loadJSON(serverId);
+            parseProfile(await getPlayerById(element), index1);
+            index1++;
+        }
+        else if (element.search("#") != -1) {
+            page = 0;
+            await loadJSON(serverId);
+            parseProfile(await getPlayerByName(element.split("#")[0], element.split("#")[1]), index1);
+            index1++;
+        }
+        else {
+            page = 0;
+            await loadJSON(serverId);
+            parseProfile(await getPlayerByName(element, null), index1);
+            index1++;
+        }
+        console.log(element);
+    }
+    console.log("string done");
 }
 
 // loose code to fetch nth page and status
@@ -176,7 +288,7 @@ async function nextPage() {
 async function addQueue() {
     queue++;
     var text = document.getElementById('text');
-    text.value = "Parsing... " + queue + "/" + queueLimit;
+    text.value = `Parsing... ${queue}/${queueLimit}`;
     await delay(1);
 }
 
@@ -185,17 +297,80 @@ function randomPlayer() {
     return result.players[Math.floor(Math.random() * result.players.length)];
 }
 
+// if input is a string/number
 async function theNeighborsKid(bruh) {
-    if (bruh.search("-") == -1 || isNaN(bruh.split("-")[0]))
+    if (bruh.search(",") != -1) await multipleSearch(bruh);
+    else if (buffer.search("#") != -1) await getUsingRank(buffer);
+    else if (bruh.search("-") == -1 || isNaN(bruh.split("-")[0])) // fc-clint bug
         parseProfile(await getPlayerByName(bruh, null), 0);
     else await rankRange(bruh);
 }
 
+// if input is a number
 async function yourMom(pussy) {
     if (pussy.toString().length >= 18) // Shobii bug
         parseProfile(await getPlayerById(pussy), 0);
     else await parseByRank(pussy);
 }
+
+// main function (fetch button)
+async function parse() {
+    var name = document.getElementById('name');
+    var parse = document.getElementById('text');
+
+    parse.value = "Parsing...";
+    parse.disabled = true; turing = false;
+    page = 0; queue = 0; queueLimit = 0;
+    if (previousQueue != name.value) destroyCards();
+    else update = true;
+    previousQueue = name.value;
+
+    endTime = new Date(Date.now() + 60 * 1000);
+    clearInterval(timerId);
+    timerId = setInterval(countdown, 1);
+
+    try {
+        await parseServer(serverBox.value);
+        stop1.disabled = false;
+        await parseInput(name.value);
+        parse.value = "Parse";
+    } catch (error) {
+        console.log(error);
+        parse.value = "Retry";
+    }
+    parse.disabled = false; stop1.disabled = true;
+}
+
+// parsing server and player
+async function parseServer(id) {
+    serverId = load(id);
+    if (serverId != "") await loadJSON(serverId);
+}
+
+async function parseInput(buffer) {
+    if (isFinite(buffer)) await yourMom(buffer);
+    else await theNeighborsKid(buffer);
+}
+
+// embed stuff
+async function embed() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+    //let value = params.some_key; // "some_value"
+
+    let player = params.player; let server = params.server;
+    console.log(server); console.log(player);
+
+    if (server != null && player != null) {
+        //?server=gmd&player=GDjkhp
+        await parseServer(server);
+        await parseInput(player);
+    }
+    // TODO: send PNG to client
+}
+embed();
 
 // 60 second countdown
 const timerEl = document.getElementById('timer');
@@ -217,47 +392,14 @@ function countdown() {
     }
 }
 
-// main function (fetch button)
-async function parseServer() {
-    //var id = document.getElementById('serverId');
-    var sel = document.getElementById('serverIdSelect');
-    var name = document.getElementById('name');
-    var parse = document.getElementById('text');
-
-    parse.value = "Parsing...";
-    parse.disabled = true; turing = false;
-    page = 0; queue = 0; queueLimit = 0;
-    if (previousQueue != name.value) destroyCards();
-    else update = true;
-    previousQueue = name.value;
-
-    endTime = new Date(Date.now() + 60 * 1000);
-    clearInterval(timerId);
-    timerId = setInterval(countdown, 1);
-
-    try {
-        //await loadId(id);
-        await load(sel.value);
-        stop1.disabled = false;
-        if (!isNaN(name.value)) await yourMom(name.value);
-        else if (name.value.search("#") != -1) await getUsingRank(name.value);
-        else await theNeighborsKid(name.value);
-        parse.value = "Parse";
-    } catch (error) {
-        console.log(error);
-        parse.value = "Retry";
-    }
-    parse.disabled = false; stop1.disabled = true;
-}
-
 // server status
 function pingpong() {
     const ping = document.getElementById('status');
     if (UrlExists(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/398627612299362304`)) {
-        ping.innerHTML = "Online";
+        ping.innerHTML = "online";
         ping.style = "font-weight: bold; color: lime;";
     } else {
-        ping.innerHTML = "Offline";
+        ping.innerHTML = "offline";
         ping.style = "font-weight: bold; color: red;";
     }
 }
@@ -267,16 +409,15 @@ pingpong();
 var stop1 = document.getElementById('stop');
 stop1.disabled = true;
 function halt() {
-    turing = true;
-
     const confirm = document.getElementById('text');
     confirm.disabled = false;
 
+    turing = true;
     stop1.disabled = true;
 }
 
 // details
-const group = document.getElementsByClassName('foot')[0];
+const group = document.getElementById('foot');
 function details() {
     group.style.display = group.style.display != "none" ? "none" : "block";
 }
@@ -286,7 +427,7 @@ const node = document.getElementById('name');
 node.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
         const confirm = document.getElementById('text');
-        if (!confirm.disabled) parseServer();
+        if (!confirm.disabled) parse();
     }
 });
 
@@ -312,14 +453,23 @@ function randomLink() {
 }
 
 function setLink(fuck, shit) {
-    fuck.href = shit;
-    fuck.innerHTML = shit;
-    currentlink = shit;
+    fuck.href = fuck.innerHTML = currentlink = shit;
 }
 
 setInterval(randomLink, 500);
 
 // utils
+const tx = document.getElementsByTagName("textarea");
+for (let i = 0; i < tx.length; i++) {
+    tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+    tx[i].addEventListener("input", OnInput, false);
+}
+
+function OnInput() {
+    this.style.height = 0;
+    this.style.height = (this.scrollHeight) + "px";
+}
+
 function getRoleColor(level) {
     const roles_rewards = result.role_rewards;
     for (let i = roles_rewards.length - 1; i >= 0; i--) {
@@ -359,8 +509,13 @@ function delay(ms) {
 function UrlExists(url) {
     var http = new XMLHttpRequest();
     http.open('HEAD', url, false);
-    http.send();
-    if (http.status != 404) 
+    try {
+        http.send();
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+    if (http.status != 404)
         return true;
     return false;
 }
@@ -372,7 +527,6 @@ function addCard() {
             <div class="rank-card-avatar">
                 <img class="avatar">
             </div>
-
             <div class="info">
                 <div class="rankgroup">
                     <span class="rank">RANK</span>
@@ -385,18 +539,19 @@ function addCard() {
                         <span class="realusername"></span>
                         <span class="discriminator"></span>
                     </span>
-                    
                     <span class="progress-label">
                         <span class="progress-label-current"></span>
                         <span class="progress-label-limit"></span>
                     </span>
                 </div>
-
                 <div class="progress">
                     <div class="progress-bar"></div>
                     <span class="progress-percent"></span>
                 </div>
-
+                <div class="progress2">
+                    <div class="progress-bar2"></div>
+                    <span class="progress-percent2"></span>
+                </div>
                 <div class="footergroup">
                     <span class="otherstats"></span>
                     <span class="server">
@@ -404,7 +559,6 @@ function addCard() {
                         <span class="servername"></span>
                     </span>
                 </div>
-                
             </div>
         </div>
     `;
@@ -422,12 +576,6 @@ function destroyCards() {
 }
 
 async function tests() {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-    });
-    // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
-    //let value = params.some_key; // "some_value"
-    // let player = params.player; let server = params.server;
-    // console.log(server); console.log(player);
+    
 }
 //tests();
