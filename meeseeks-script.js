@@ -287,8 +287,7 @@ async function nextPage() {
 // queue info, delays 1ms
 async function addQueue() {
     queue++;
-    var text = document.getElementById('text');
-    text.value = `Parsing... ${queue}/${queueLimit}`;
+    parseButton.value = `Parsing... ${queue}/${queueLimit}`;
     await delay(1);
 }
 
@@ -314,16 +313,15 @@ async function yourMom(pussy) {
 }
 
 // main function (fetch button)
+var parseButton = document.getElementById('text');
+var node = document.getElementById('name');
 async function parse() {
-    var name = document.getElementById('name');
-    var parse = document.getElementById('text');
-
-    parse.value = "Parsing...";
-    parse.disabled = true; turing = false;
+    parseButton.value = "Parsing...";
+    parseButton.disabled = true; turing = false;
     page = 0; queue = 0; queueLimit = 0;
-    if (previousQueue != name.value) destroyCards();
+    if (previousQueue != node.value) destroyCards();
     else update = true;
-    previousQueue = name.value;
+    previousQueue = node.value;
 
     endTime = new Date(Date.now() + 60 * 1000);
     clearInterval(timerId);
@@ -332,13 +330,13 @@ async function parse() {
     try {
         await parseServer(serverBox.value);
         stop1.disabled = false;
-        await parseInput(name.value);
-        parse.value = "Parse";
+        await parseInput(node.value);
+        parseButton.value = "Parse";
     } catch (error) {
         console.log(error);
-        parse.value = "Retry";
+        parseButton.value = "Retry";
     }
-    parse.disabled = false; stop1.disabled = true;
+    parseButton.disabled = false; stop1.disabled = true;
 }
 
 // parsing server and player
@@ -363,21 +361,20 @@ async function embed() {
     let player = params.player; let server = params.server;
     console.log(server); console.log(player);
 
+    //?server=gmd&player=GDjkhp
     if (server != null && player != null) {
         page = 0; queue = 0; queueLimit = 0;
-        parse.disabled = true; turing = false;
-        //?server=gmd&player=GDjkhp
-        
+        parseButton.disabled = true; turing = false;
         try {
             await parseServer(server);
             stop1.disabled = false;
             await parseInput(player);
-            parse.value = "Parse";
+            parseButton.value = "Parse";
         } catch (error) {
             console.log(error);
-            parse.value = "Retry";
+            parseButton.value = "Retry";
         }
-        parse.disabled = false; stop1.disabled = true;
+        parseButton.disabled = false; stop1.disabled = true;
     }
     // TODO: send PNG to client
 }
@@ -420,11 +417,7 @@ pingpong();
 var stop1 = document.getElementById('stop');
 stop1.disabled = true;
 function halt() {
-    const confirm = document.getElementById('text');
-    confirm.disabled = false;
-
-    turing = true;
-    stop1.disabled = true;
+    parseButton.disabled = false; turing = true; stop1.disabled = true;
 }
 
 // details
@@ -434,12 +427,10 @@ function details() {
 }
 
 // enter for pc peeps
-const node = document.getElementById('name');
 node.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
-        const confirm = document.getElementById('text');
-        if (!confirm.disabled) parse();
+        if (!parseButton.disabled) parse();
     }
 });
 
