@@ -391,6 +391,7 @@ async function embed() {
 
     //?server=gmd&player=GDjkhp
     if (server != null && player != null) {
+        node.value = player;
         reset();
         await parseReal(server, player);
     }
