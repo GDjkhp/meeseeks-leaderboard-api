@@ -316,6 +316,11 @@ async function yourMom(pussy) {
 var parseButton = document.getElementById('text');
 var node = document.getElementById('name');
 async function parse() {
+    reset();
+    await parseReal(serverBox.value, node.value);
+}
+
+function reset() {
     parseButton.value = "Parsing...";
     parseButton.disabled = true; turing = false;
     page = 0; queue = 0; queueLimit = 0;
@@ -326,11 +331,14 @@ async function parse() {
     endTime = new Date(Date.now() + 60 * 1000);
     clearInterval(timerId);
     timerId = setInterval(countdown, 1);
+}
 
+// real main
+async function parseReal(server, input) {
     try {
-        await parseServer(serverBox.value);
+        await parseServer(server);
         stop1.disabled = false;
-        await parseInput(node.value);
+        await parseInput(input);
         parseButton.value = "Parse";
     } catch (error) {
         console.log(error);
@@ -363,18 +371,8 @@ async function embed() {
 
     //?server=gmd&player=GDjkhp
     if (server != null && player != null) {
-        page = 0; queue = 0; queueLimit = 0;
-        parseButton.disabled = true; turing = false;
-        try {
-            await parseServer(server);
-            stop1.disabled = false;
-            await parseInput(player);
-            parseButton.value = "Parse";
-        } catch (error) {
-            console.log(error);
-            parseButton.value = "Retry";
-        }
-        parseButton.disabled = false; stop1.disabled = true;
+        reset();
+        await parseReal(server, player);
     }
     // TODO: send PNG to client
 }
