@@ -364,9 +364,20 @@ async function embed() {
     console.log(server); console.log(player);
 
     if (server != null && player != null) {
+        page = 0; queue = 0; queueLimit = 0;
+        parse.disabled = true; turing = false;
         //?server=gmd&player=GDjkhp
-        await parseServer(server);
-        await parseInput(player);
+        
+        try {
+            await parseServer(server);
+            stop1.disabled = false;
+            await parseInput(player);
+            parse.value = "Parse";
+        } catch (error) {
+            console.log(error);
+            parse.value = "Retry";
+        }
+        parse.disabled = false; stop1.disabled = true;
     }
     // TODO: send PNG to client
 }
