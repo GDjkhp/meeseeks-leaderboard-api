@@ -358,26 +358,6 @@ async function parseInput(buffer) {
     else await theNeighborsKid(buffer);
 }
 
-// embed stuff
-async function embed() {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-    });
-    // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
-    //let value = params.some_key; // "some_value"
-
-    let player = params.player; let server = params.server;
-    console.log(server); console.log(player);
-
-    //?server=gmd&player=GDjkhp
-    if (server != null && player != null) {
-        reset();
-        await parseReal(server, player);
-    }
-    // TODO: send PNG to client
-}
-embed();
-
 // 60 second countdown
 const timerEl = document.getElementById('timer');
 let endTime, timerId;
@@ -397,6 +377,26 @@ function countdown() {
         timerEl.innerText = "00:00.00";
     }
 }
+
+// embed stuff
+async function embed() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+    //let value = params.some_key; // "some_value"
+
+    let player = params.player; let server = params.server;
+    console.log(server); console.log(player);
+
+    //?server=gmd&player=GDjkhp
+    if (server != null && player != null) {
+        reset();
+        await parseReal(server, player);
+    }
+    // TODO: send PNG to client
+}
+embed();
 
 // server status
 function pingpong() {
