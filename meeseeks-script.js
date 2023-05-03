@@ -41,7 +41,9 @@ serverSelect.addEventListener('change', () => {
 // returns a neat rank card
 async function parseProfile(player, target) {
     if (player == null) return;
-    if (!update || document.getElementsByClassName('rank-card')[target] == null) addCard();
+    const rankcard = document.getElementsByClassName('rank-card')[target];
+    if (!update || rankcard == null) addCard();
+    else rankcard.style = "opacity: 1;";
     var color = getRoleColor(player.level);
 
     const user = document.getElementsByClassName('realusername')[target];
@@ -325,7 +327,13 @@ function reset() {
     parseButton.disabled = true; turing = false;
     page = 0; queue = 0; queueLimit = 0;
     if (previousQueue != node.value) destroyCards();
-    else update = true;
+    else {
+        update = true;
+        const card = document.getElementsByClassName('rank-card');
+        Array.from(card).forEach(element => {
+            element.style = "opacity: 0.5;";
+        });
+    }
     previousQueue = node.value;
 
     endTime = new Date(Date.now() + 60 * 1000);
@@ -426,7 +434,7 @@ function details() {
 }
 
 // enter for pc peeps
-node.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
         if (!parseButton.disabled) parse();
