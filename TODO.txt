@@ -1,0 +1,5 @@
+TODO:
+
+more customization options (low priority)
+badges (low priority)
+embeds and png (low priority)
