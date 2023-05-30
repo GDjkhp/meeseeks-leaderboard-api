@@ -186,8 +186,7 @@ async function rankRange(text) {
 
 // split the search using commas
 async function multipleSearch(text) {
-    var spl = text.search(", ") != -1 ? ", " : ","; // bad
-    var query = text.split(spl);
+    var query = text.split(/\s*,\s*/);
     console.log(query);
     var index1 = 0;
 
