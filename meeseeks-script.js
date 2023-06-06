@@ -66,7 +66,7 @@ async function parseProfile(player, target) {
     const xp = document.getElementsByClassName('progress-label-current')[target];
     xp.innerHTML = player.detailed_xp[0];
 
-    const xp2= document.getElementsByClassName('progress-label-limit')[target];
+    const xp2 = document.getElementsByClassName('progress-label-limit')[target];
     xp2.innerHTML = ` / ${player.detailed_xp[1]} XP`;
 
     const bar = document.getElementsByClassName('progress-bar')[target];
@@ -74,7 +74,14 @@ async function parseProfile(player, target) {
 
     const avatar = document.getElementsByClassName('avatar')[target];
     const url = `https://cdn.discordapp.com/avatars/${player.id}/${player.avatar}`;
-    avatar.src = player.avatar != "" && UrlExists(url) ? url : "https://gdjkhp.github.io/img/dc.png";
+    const isActive = UrlExists(url);
+    avatar.src = player.avatar != "" && isActive ? url : "https://gdjkhp.github.io/img/dc.png";
+
+    if (!isActive) {
+        const strike = document.createElement('s');
+        user.parentNode.insertBefore(strike, user);
+        strike.appendChild(user);
+    }
 
     const others = document.getElementsByClassName('otherstats')[target];
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
@@ -107,6 +114,32 @@ async function parseProfile(player, target) {
     const usernamegroup = document.getElementsByClassName('username')[target];
     usernamegroup.parentNode.insertBefore(a2, usernamegroup);
     a2.appendChild(usernamegroup);
+
+    var luckColor = "white";
+    const arrow = document.getElementsByClassName('progress-label-luck')[target];
+    // blazing fast previous player locator
+    var rankMinus1 = getRank(player);
+    var pageT = rankMinus1 / 1000 >> 0;
+    var storePage = 0, prevPlayer;
+    if (page != pageT) {
+        storePage = page;
+        page = pageT;
+        await loadJSON(serverId);
+        prevPlayer = result.players[rankMinus1 - (page*1000)];
+        page = storePage;
+        await loadJSON(serverId);
+    }
+    else prevPlayer = result.players[rankMinus1 - (page*1000)];
+    if (prevPlayer.xp != player.xp || player.message_count != prevPlayer.message_count) {
+        boolean = player.message_count - prevPlayer.message_count > 0;
+        luckColor = boolean ? "red" : "lime";
+        arrow.style.color = luckColor;
+        arrow.innerHTML = boolean ? "&darr;" : "&uarr;";
+    }
+
+    const msg = document.getElementsByClassName('progress-label-msg')[target];
+    msg.style.color = luckColor;
+    msg.innerHTML = `${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)}`;
 }
 
 // returns player rank
@@ -122,7 +155,7 @@ async function parseByRank(number) {
     queueLimit = number;
     for(var index = 0; index < number && !turing; index++) {
         if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-        parseProfile(result.players[index - (page * 1000)], index);
+        await parseProfile(result.players[index - (page * 1000)], index);
         await addQueue();
     }
 }
@@ -156,11 +189,14 @@ async function getPlayerById(id) {
 async function getUsingRank(text) {
     if (text.split("#")[0] == "") { 
         var rankMinus1 = text.split("#")[1]-1;
-        page = rankMinus1 / 1000 >> 0;
-        if (page != 0) await loadJSON(serverId);
-        parseProfile(result.players[(rankMinus1%1000)], 0);
+        var pageT = rankMinus1 / 1000 >> 0;
+        if (page != pageT) {
+            page = pageT;
+            await loadJSON(serverId);
+        }
+        await parseProfile(result.players[(rankMinus1%1000)], 0);
     } else {
-        parseProfile(await getPlayerByName(text.split("#")[0], text.split("#")[1]), 0); // very accurate input cuz yes
+        await parseProfile(await getPlayerByName(text.split("#")[0], text.split("#")[1]), 0); // very accurate input cuz yes
     }
 }
 
@@ -178,7 +214,7 @@ async function rankRange(text) {
         if (page != 0) await loadJSON(serverId);
         for (var index = min, target = 0; index < max && !turing; index++, target++) {
             if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-            parseProfile(result.players[index - (page * 1000)], target);
+            await parseProfile(result.players[index - (page * 1000)], target);
             await addQueue();
         }
     }
@@ -199,7 +235,7 @@ async function multipleSearch(text) {
             queueLimit = query[lengthMinus1];
             for(var index = 0; index < query[lengthMinus1] && !turing; index++) {
                 if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-                parseProfile(result.players[index - (page * 1000)], index1);
+                await parseProfile(result.players[index - (page * 1000)], index1);
                 index1++;
                 await addQueue();
             }
@@ -224,7 +260,7 @@ async function multipleSearch(text) {
             await loadJSON(serverId);
             for (var index = min; index < max && !turing; index++) {
                 if (index != 0 && index % 1000 == 0) if (!await nextPage()) break;
-                parseProfile(result.players[index - (page * 1000)], index1);
+                await parseProfile(result.players[index - (page * 1000)], index1);
                 index1++;
                 await addQueue();
             }
@@ -239,9 +275,12 @@ async function multipleSearch(text) {
     while(lengthMinus1 >= 0) {
         if (query[lengthMinus1].search("#") != -1 && query[lengthMinus1].split("#")[0] == "") {
             var rankMinus1 = query[lengthMinus1].split("#")[1]-1;
-            page = rankMinus1 / 1000 >> 0;
-            await loadJSON(serverId);
-            parseProfile(result.players[(rankMinus1%1000)], index1);
+            var pageT = rankMinus1 / 1000 >> 0;
+            if (page != pageT) {
+                page = pageT;
+                await loadJSON(serverId);
+            }
+            await parseProfile(result.players[(rankMinus1%1000)], index1);
             index1++;
             console.log(query.splice(lengthMinus1, 1));
         }
@@ -255,19 +294,19 @@ async function multipleSearch(text) {
         if (element.toString().length >= 18) {
             page = 0;
             await loadJSON(serverId);
-            parseProfile(await getPlayerById(element), index1);
+            await parseProfile(await getPlayerById(element), index1);
             index1++;
         }
         else if (element.search("#") != -1) {
             page = 0;
             await loadJSON(serverId);
-            parseProfile(await getPlayerByName(element.split("#")[0], element.split("#")[1]), index1);
+            await parseProfile(await getPlayerByName(element.split("#")[0], element.split("#")[1]), index1);
             index1++;
         }
         else {
             page = 0;
             await loadJSON(serverId);
-            parseProfile(await getPlayerByName(element, null), index1);
+            await parseProfile(await getPlayerByName(element, null), index1);
             index1++;
         }
         console.log(element);
@@ -302,14 +341,14 @@ async function theNeighborsKid(bruh) {
     if (bruh.search(",") != -1) await multipleSearch(bruh);
     else if (bruh.search("#") != -1) await getUsingRank(bruh);
     else if (bruh.search("-") == -1 || isNaN(bruh.split("-")[0])) // fc-clint bug
-        parseProfile(await getPlayerByName(bruh, null), 0);
+        await parseProfile(await getPlayerByName(bruh, null), 0);
     else await rankRange(bruh);
 }
 
 // if input is a number
 async function yourMom(pussy) {
     if (pussy.toString().length >= 18) // Shobii bug
-        parseProfile(await getPlayerById(pussy), 0);
+        await parseProfile(await getPlayerById(pussy), 0);
     else await parseByRank(pussy);
 }
 
@@ -551,6 +590,8 @@ function addCard() {
                     <span class="progress-label">
                         <span class="progress-label-current"></span>
                         <span class="progress-label-limit"></span>
+                        <span class="progress-label-luck">&uarr;&darr;</span>
+                        <span class="progress-label-msg">?</span>
                     </span>
                 </div>
                 <div class="progress">
