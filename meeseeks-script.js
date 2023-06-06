@@ -74,10 +74,10 @@ async function parseProfile(player, target) {
 
     const avatar = document.getElementsByClassName('avatar')[target];
     const url = `https://cdn.discordapp.com/avatars/${player.id}/${player.avatar}`;
-    const isActive = player.avatar != "" && UrlExists(url);
-    avatar.src = isActive ? url : "https://gdjkhp.github.io/img/dc.png";
+    const isActive = UrlExists(url);
+    avatar.src = player.avatar != "" && isActive ? url : "https://gdjkhp.github.io/img/dc.png";
 
-    if (!isActive) {
+    if (player.avatar != "" && !isActive) {
         const strike = document.createElement('s');
         user.parentNode.insertBefore(strike, user);
         strike.appendChild(user);
