@@ -215,8 +215,9 @@
         <textarea value="" id="name" style="height: 0;"></textarea>
         <br>
         <input type="button" value="Parse" id="text" onclick="parse();">
-        <input type="button" value="X" id="stop" onclick="halt();">
-        <input type="button" value="?" onclick="details();">
+        <input type="button" value="&#x274C;" id="stop" onclick="halt();">
+        <input type="button" value="&#x2753;" onclick="details();">
+        <input type="button" value="&#x1F4BE;" onclick="convertDivToImage();">
         <br>
         <span id="timer" style="font-weight: bold;">01:00.00</span>
         <div id="foot" style="display: none;">
@@ -271,5 +272,6 @@
     <div style="height: 50%;">
         <!-- <p>hello darkness my old friend</p> -->
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
     <script src="meeseeks-script.js"></script>
 </body>

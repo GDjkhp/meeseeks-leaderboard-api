@@ -3,9 +3,9 @@ var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update 
 // cors unblocked api server, please don't abuse (rate limited, can ban my server's ip address), delays 500ms
 async function loadJSON(id) {
     if (turing) return;
-    // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
+    result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
-    result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+    // result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
     if (page == 0) topXP = result.players[0].xp;
     await delay(500);
@@ -85,6 +85,13 @@ async function parseProfile(player, target) {
 
     const others = document.getElementsByClassName('otherstats')[target];
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
+    // will remove after october 26
+    if (player.id == "729554186777133088" && serverId == "398627612299362304") {
+        timerElBan = others;
+        player0 = player;
+        clearInterval(timerIdGDjkhp);
+        timerIdGDjkhp = setInterval(countdown0, 1);
+    }
     
     const servericon = document.getElementsByClassName('serverpng')[target];
     const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
@@ -445,10 +452,10 @@ async function embed() {
 }
 embed();
 
-// server status
+// FIXME: server status
+const ping = document.getElementById('status');
 function pingpong() {
-    const ping = document.getElementById('status');
-    if (UrlExists(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/398627612299362304`)) {
+    if (UrlExists(`https://meeseeks-api.gdjkhp.repl.co/398627612299362304`)) {
         ping.innerHTML = "online";
         ping.style = "font-weight: bold; color: lime;";
     } else {
@@ -503,7 +510,6 @@ function randomLink() {
 function setLink(fuck, shit) {
     fuck.href = fuck.innerHTML = currentlink = shit;
 }
-
 setInterval(randomLink, 500);
 
 // utils
@@ -625,7 +631,60 @@ function destroyCards() {
     }
 }
 
+// OCTOBER 26, 2023
+let timerElBan, timerIdGDjkhp, player0;
+function countdown0() {
+    // Calculate time difference between now and end time
+    const timeDiff = new Date("2023-10-26") - new Date();
+    // Calculate days, hours, minutes, seconds, and milliseconds
+    const days = String(Math.floor(timeDiff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    const hours = String(Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    const minutes = String(Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    const seconds = String(Math.floor((timeDiff % (1000 * 60)) / 1000)).padStart(2, '0');
+    const milliseconds = String(Math.floor((timeDiff % 1000) / 10)).padStart(2, '0');
+    const displayTime = `${days}:${hours}:${minutes}:${seconds}.${milliseconds}`;
+    // Update timer display
+    timerElBan.innerText = `Total XP: ${player0.xp}, Total msg: ${player0.message_count}, Time spent: ${displayTime}`;
+    // Stop the countdown when timeLeft reaches 0
+    if (timeDiff <= 0) {
+        clearInterval(timerIdGDjkhp);
+        timerElBan.innerText = `Total XP: ${player0.xp}, Total msg: ${player0.message_count}, Time spent: ${getTime(player0.message_count)}`;
+    }
+}
+
 async function tests() {
     
 }
 //tests();
+
+// work in progress
+function convertDivToImage() {
+    const divElement = document.getElementsByClassName('rank-card')[0];
+    if (divElement == null) return;
+    // Set the scale factor to increase the resolution (e.g., 2 for doubling the resolution)
+    const scale = 8;
+    // Calculate the scaled dimensions of the div
+    const scaledWidth = divElement.offsetWidth * scale;
+    const scaledHeight = divElement.offsetHeight * scale;
+    // Use html2canvas to capture the div element
+    html2canvas(divElement, { 
+        scale: scale, proxy: 'https://html2canvas-proxy-nodejs.gdjkhp.repl.co/'
+    }).then((canvas) => {
+        // Create a scaled canvas element to preserve the higher resolution
+        const scaledCanvas = document.createElement('canvas');
+        scaledCanvas.width = scaledWidth;
+        scaledCanvas.height = scaledHeight;
+        const scaledContext = scaledCanvas.getContext('2d');
+        // Scale the captured canvas onto the scaled canvas
+        scaledContext.drawImage(canvas, 0, 0, scaledWidth, scaledHeight);
+        // Convert the canvas to a data URL representing a PNG image
+        const dataUrl = canvas.toDataURL('image/png');
+        // Create a link element and set its href attribute to the data URL
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        // Set the download attribute and the desired filename for the link
+        link.download = 'div_image.png';
+        // Programmatically trigger a click event on the link element to start the download
+        link.click();
+    });
+}
