@@ -82,16 +82,6 @@ async function parseProfile(player, target) {
         user.parentNode.insertBefore(strike, user);
         strike.appendChild(user);
     }
-
-    const others = document.getElementsByClassName('otherstats')[target];
-    others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
-    // will remove after october 26
-    if (player.id == "729554186777133088" && serverId == "398627612299362304") {
-        timerElBan = others;
-        player0 = player;
-        clearInterval(timerIdGDjkhp);
-        timerIdGDjkhp = setInterval(countdown0, 1);
-    }
     
     const servericon = document.getElementsByClassName('serverpng')[target];
     const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
@@ -147,6 +137,42 @@ async function parseProfile(player, target) {
     const msg = document.getElementsByClassName('progress-label-msg')[target];
     msg.style.color = luckColor;
     msg.innerHTML = `${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)}`;
+
+    const others = document.getElementsByClassName('otherstats')[target];
+    others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
+    // banned members support
+    if (serverId == "398627612299362304") {
+        if (player.id == "729554186777133088") {
+            let timerIdGDjkhp;
+            clearInterval(timerIdGDjkhp);
+            timerIdGDjkhp = setInterval(() => countdown0(others, timerIdGDjkhp, player, "2023-10-26"), 1);
+        }
+        if (player.id == "1003633156408229959") {
+            let timerIdVania;
+            clearInterval(timerIdVania);
+            timerIdVania = setInterval(() => countdown0(others, timerIdVania, player, "2024-12-23"), 1);
+        }
+    }
+}
+
+// APPEAL COOLDOWN
+function countdown0(timerElBan, timerId, player0, date) {
+    // Calculate time difference between now and end time
+    const timeDiff = new Date(date) - new Date();
+    // Calculate days, hours, minutes, seconds, and milliseconds
+    const days = String(Math.floor(timeDiff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    const hours = String(Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    const minutes = String(Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    const seconds = String(Math.floor((timeDiff % (1000 * 60)) / 1000)).padStart(2, '0');
+    const milliseconds = String(Math.floor((timeDiff % 1000) / 10)).padStart(2, '0');
+    const displayTime = `${days}:${hours}:${minutes}:${seconds}.${milliseconds}`;
+    // Update timer display
+    timerElBan.innerText = `Total XP: ${player0.xp}, Total msg: ${player0.message_count}, Time spent: ${displayTime}`;
+    // Stop the countdown when timeLeft reaches 0
+    if (timeDiff <= 0) {
+        clearInterval(timerId);
+        timerElBan.innerText = `Total XP: ${player0.xp}, Total msg: ${player0.message_count}, Time spent: ${getTime(player0.message_count)}`;
+    }
 }
 
 // returns player rank
@@ -628,27 +654,6 @@ function destroyCards() {
     const elements = document.getElementsByClassName('rank-card');
     while(elements.length > 0) {
         elements[0].parentNode.removeChild(elements[0]);
-    }
-}
-
-// OCTOBER 26, 2023
-let timerElBan, timerIdGDjkhp, player0;
-function countdown0() {
-    // Calculate time difference between now and end time
-    const timeDiff = new Date("2023-10-26") - new Date();
-    // Calculate days, hours, minutes, seconds, and milliseconds
-    const days = String(Math.floor(timeDiff / (1000 * 60 * 60 * 24))).padStart(2, '0');
-    const hours = String(Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-    const minutes = String(Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-    const seconds = String(Math.floor((timeDiff % (1000 * 60)) / 1000)).padStart(2, '0');
-    const milliseconds = String(Math.floor((timeDiff % 1000) / 10)).padStart(2, '0');
-    const displayTime = `${days}:${hours}:${minutes}:${seconds}.${milliseconds}`;
-    // Update timer display
-    timerElBan.innerText = `Total XP: ${player0.xp}, Total msg: ${player0.message_count}, Time spent: ${displayTime}`;
-    // Stop the countdown when timeLeft reaches 0
-    if (timeDiff <= 0) {
-        clearInterval(timerIdGDjkhp);
-        timerElBan.innerText = `Total XP: ${player0.xp}, Total msg: ${player0.message_count}, Time spent: ${getTime(player0.message_count)}`;
     }
 }
 
