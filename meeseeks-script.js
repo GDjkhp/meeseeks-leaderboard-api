@@ -673,7 +673,7 @@ function convertDivToImage() {
     const scaledHeight = divElement.offsetHeight * scale;
     // Use html2canvas to capture the div element
     html2canvas(divElement, { 
-        scale: scale, proxy: 'https://html2canvas-proxy-nodejs.gdjkhp.repl.co/'
+        scale: scale, proxy: 'https://html2canvas-proxy-nodejs.gdjkhp.repl.co/', backgroundColor: null
     }).then((canvas) => {
         // Create a scaled canvas element to preserve the higher resolution
         const scaledCanvas = document.createElement('canvas');
