@@ -77,7 +77,7 @@ async function parseProfile(player, target) {
     const isActive = UrlExists(url);
     avatar.src = player.avatar != "" && isActive ? url : "https://gdjkhp.github.io/img/dc.png";
 
-    if (player.avatar != "" && !isActive) {
+    if (player.avatar != null && !isActive) {
         const strike = document.createElement('s');
         user.parentNode.insertBefore(strike, user);
         strike.appendChild(user);
