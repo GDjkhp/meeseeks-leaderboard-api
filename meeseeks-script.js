@@ -48,6 +48,7 @@ serverBox.value = load(serverSelect.value);
 serverSelect.addEventListener('change', () => {
     serverSelect.value != 'id' ? serverBox.disabled = true : serverBox.disabled = false;
     serverBox.value = load(serverSelect.value);
+    setLink(document.getElementById('link'), `https://mee6.xyz/api/plugins/levels/leaderboard/${serverBox.value}`);
 });
 
 // returns a neat rank card
@@ -451,6 +452,7 @@ async function parseReal(server, input) {
 async function parseServer(id) {
     serverId = load(id);
     if (serverId != "") await loadJSON(serverId);
+    setLink(document.getElementById('link'), `https://mee6.xyz/api/plugins/levels/leaderboard/${serverId}`);
 }
 
 async function parseInput(buffer) {
@@ -534,30 +536,11 @@ document.addEventListener("keydown", function(event) {
 });
 
 // credits link
-currentlink = "";
-function randomLink() {
-    var gmd = "https://mee6.xyz/api/plugins/levels/leaderboard/398627612299362304";
-    var mc = "https://mee6.xyz/api/plugins/levels/leaderboard/302094807046684672";
-    var tml = "https://mee6.xyz/api/plugins/levels/leaderboard/251072485095636994";
-
-    switch (currentlink) {
-        case gmd:
-            setLink(document.getElementById('link'), mc);
-            break;
-        case mc:
-            setLink(document.getElementById('link'), tml);
-            break;
-        default:
-        case tml:
-            setLink(document.getElementById('link'), gmd);
-            break;
-    }
-}
-
+currentlink = "https://mee6.xyz/api/plugins/levels/leaderboard/398627612299362304";
 function setLink(fuck, shit) {
     fuck.href = fuck.innerHTML = currentlink = shit;
 }
-setInterval(randomLink, 500);
+setLink(document.getElementById('link'), currentlink);
 
 // utils
 const tx = document.getElementsByTagName("textarea");
