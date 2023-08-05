@@ -61,6 +61,15 @@ async function parseProfile(player, target) {
     const user = document.getElementsByClassName('realusername')[target];
     user.innerHTML = player.username;
     user.style = `font-size: 24px; font-weight: bold; color: ${color};`;
+    // strikethrough update fix
+    const parent = document.getElementsByClassName("username")[target];
+    const elementToRemove = parent.querySelector("s");
+    if (elementToRemove) {
+        while (elementToRemove.firstChild) {
+            parent.insertBefore(elementToRemove.firstChild, elementToRemove);
+        }
+        parent.removeChild(elementToRemove);
+    }
 
     const discordtag = document.getElementsByClassName('discriminator')[target];
     discordtag.innerHTML = `#${player.discriminator}`;
