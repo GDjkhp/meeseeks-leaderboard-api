@@ -25,6 +25,18 @@ function load(sel) {
             return "302094807046684672";
         case "tml":
             return "251072485095636994";
+        case "roblox":
+            return "150074202727251969";
+        case "destiny":
+            return "356833056562348042";
+        case "lofi":
+            return "707230275175841915";
+        case "walker":
+            return "827254215717814282";
+        case "bluewillow":
+            return "1046979304547954728";
+        case "opera":
+            return "715121965563772980";
     }
     return "";
 }
