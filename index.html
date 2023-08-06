@@ -147,23 +147,6 @@
         .otherstats {
             opacity: 0.7;
             white-space: nowrap; /* Prevent wrapping within the span */
-            position: relative; /* Create a positioning context for pseudo-elements */
-        }
-        .otherstats::after {
-            position: absolute;
-            left: 0;
-            white-space: pre; /* Preserve whitespace */
-        }
-
-        /* Apply styles to the second comma and beyond */
-        .otherstats::before {
-            position: absolute;
-            white-space: pre; /* Preserve whitespace */
-        }
-
-        /* Adjust positioning for the second comma and beyond */
-        .otherstats::before {
-            left: 100%; /* Position the comma after the text */
         }
         .servername {
             opacity: 0.7;
