@@ -48,7 +48,8 @@ serverBox.value = load(serverSelect.value);
 serverSelect.addEventListener('change', () => {
     serverSelect.value != 'id' ? serverBox.disabled = true : serverBox.disabled = false;
     serverBox.value = load(serverSelect.value);
-    setLink(document.getElementById('link'), `https://mee6.xyz/api/plugins/levels/leaderboard/${serverBox.value}`);
+    setLink("link", `https://mee6.xyz/api/plugins/levels/leaderboard/${serverBox.value}`);
+    setLink("linker", `https://mee6.xyz/leaderboard/${serverBox.value}`);
 });
 
 // returns a neat rank card
@@ -452,7 +453,8 @@ async function parseReal(server, input) {
 async function parseServer(id) {
     serverId = load(id);
     if (serverId != "") await loadJSON(serverId);
-    setLink(document.getElementById('link'), `https://mee6.xyz/api/plugins/levels/leaderboard/${serverId}`);
+    setLink("link", `https://mee6.xyz/api/plugins/levels/leaderboard/${serverId}`);
+    setLink("linker", `https://mee6.xyz/leaderboard/${serverId}`);
 }
 
 async function parseInput(buffer) {
@@ -537,10 +539,13 @@ document.addEventListener("keydown", function(event) {
 
 // credits link
 currentlink = "https://mee6.xyz/api/plugins/levels/leaderboard/398627612299362304";
-function setLink(fuck, shit) {
+currentlinker = "https://mee6.xyz/leaderboard/398627612299362304";
+function setLink(bitch, shit) {
+    fuck = document.getElementById(bitch);
     fuck.href = fuck.innerHTML = currentlink = shit;
 }
-setLink(document.getElementById('link'), currentlink);
+setLink("link", currentlink);
+setLink("linker", currentlinker);
 
 // utils
 const tx = document.getElementsByTagName("textarea");
