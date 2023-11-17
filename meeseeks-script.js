@@ -3,8 +3,8 @@ var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update 
 // cors unblocked api server, please don't abuse (rate limited, can ban my server's ip address), delays 500ms
 async function loadJSON(id) {
     if (turing) return;
-    // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
-    result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+    result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
+    // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
     if (page == 0) topXP = result.players[0].xp;
@@ -438,8 +438,8 @@ function reset() {
 // real main
 async function parseReal(server, input) {
     try {
-        await parseServer(server);
         stop1.disabled = false;
+        await parseServer(server);
         await parseInput(input);
         parseButton.value = "Parse";
     } catch (error) {
