@@ -1,9 +1,10 @@
-var result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP;
+var cors = "https://corsproxy.io/?https://mee6.xyz/api/plugins/levels/leaderboard/", 
+result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP;
 
 // cors unblocked api server, please don't abuse (rate limited, can ban my server's ip address), delays 500ms
 async function loadJSON(id) {
     if (turing) return;
-    result = await fetch(`https://corsproxy.io/?https://mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
+    result = await fetch(`${cors}${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
@@ -507,7 +508,7 @@ embed();
 // FIXME: server status
 const ping = document.getElementById('status');
 function pingpong() {
-    if (UrlExists(`https://meeseeks-api.gdjkhp.repl.co/398627612299362304`)) {
+    if (UrlExists(`${cors}398627612299362304`)) {
         ping.innerHTML = "online";
         ping.style = "font-weight: bold; color: lime;";
     } else {
