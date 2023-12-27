@@ -178,11 +178,9 @@ async function parseProfile(player, target) {
 
     // Add a click event listener to the span element
     others.addEventListener('click', () => {
-        const textToCopy = copystats; // Get the text content from the span
-
         // Create a temporary textarea element to copy the text to the clipboard
         const textarea = document.createElement('textarea');
-        textarea.value = textToCopy;
+        textarea.value = copystats;
         document.body.appendChild(textarea);
 
         // Select the text within the textarea
@@ -196,7 +194,7 @@ async function parseProfile(player, target) {
         document.body.removeChild(textarea);
 
         // Inform the user that the text has been copied (optional)
-        alert(`Text has been copied to clipboard!\n\n${textToCopy}`);
+        alert(`Text has been copied to clipboard!\n\n${copystats}`);
     });
 
     // banned members support
