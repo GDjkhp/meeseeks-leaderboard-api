@@ -1,5 +1,5 @@
 var cors = "https://corsproxy.io/?https://mee6.xyz/api/plugins/levels/leaderboard/", 
-result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP;
+result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP, topPlayer;
 
 // cors unblocked api server, please don't abuse (rate limited, can ban my server's ip address), delays 500ms
 async function loadJSON(id) {
@@ -9,7 +9,10 @@ async function loadJSON(id) {
     // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
-    if (page == 0) topXP = result.players[0].xp;
+    if (page == 0) {
+        topXP = result.players[0].xp;
+        topPlayer = `${result.players[0].username}${result.players[0].discriminator == "0" ? "" : `#${result.players[0].discriminator}`}`;
+    }
     await delay(500);
 }
 
@@ -76,7 +79,7 @@ async function parseProfile(player, target) {
     }
 
     const discordtag = document.getElementsByClassName('discriminator')[target];
-    discordtag.innerHTML = `#${player.discriminator}`;
+    discordtag.innerHTML = player.discriminator == "0" ? "" : `#${player.discriminator}`;
 
     const rank = document.getElementsByClassName('rank-number')[target];
     rank.innerHTML = `#${getRank(player)}`;
@@ -126,13 +129,13 @@ async function parseProfile(player, target) {
 
     const a = document.createElement("a");
     a.href = `https://discord.com/users/${player.id}`;
-    a.target = "discord";
+    a.target = "discord"; // bug: doesn't reuse the loaded tab
     avatar.parentNode.insertBefore(a, avatar);
     a.appendChild(avatar);
 
     const a2 = document.createElement("a");
     a2.href = `https://discord.com/users/${player.id}`;
-    a2.target = "discord";
+    a2.target = "discord"; // bug: doesn't reuse the loaded tab
     const usernamegroup = document.getElementsByClassName('username')[target];
     usernamegroup.parentNode.insertBefore(a2, usernamegroup);
     a2.appendChild(usernamegroup);
@@ -165,6 +168,37 @@ async function parseProfile(player, target) {
 
     const others = document.getElementsByClassName('otherstats')[target];
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
+
+    let copystats = 
+    `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
+    }, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
+    }, ${player.detailed_xp[0]}/${player.detailed_xp[1]} XP ${arrow.textContent} ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
+    }, ${round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)
+    }%, ${round(player.xp / topXP * 100, 2)}% of ${topPlayer}`;
+
+    // Add a click event listener to the span element
+    others.addEventListener('click', () => {
+        const textToCopy = copystats; // Get the text content from the span
+
+        // Create a temporary textarea element to copy the text to the clipboard
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        document.body.appendChild(textarea);
+
+        // Select the text within the textarea
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the selected text to the clipboard
+        document.execCommand('copy');
+
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
+
+        // Inform the user that the text has been copied (optional)
+        alert(`Text has been copied to clipboard!\n\n${textToCopy}`);
+    });
+
     // banned members support
     if (serverId == "398627612299362304") {
         // if (player.id == "729554186777133088") {

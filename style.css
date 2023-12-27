@@ -114,6 +114,9 @@ body {
 .usernamegroup a:hover {
     text-decoration: underline;
 }
+.otherstats:hover {
+    text-decoration: underline;
+  }
 .discriminator {
     font-size: 16px;
     opacity: 0.7;
