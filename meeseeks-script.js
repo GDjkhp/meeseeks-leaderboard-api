@@ -166,7 +166,7 @@ async function parseProfile(player, target) {
     msg.style.color = luckColor;
     msg.innerHTML = `${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)}`;
 
-    const others = document.getElementsByClassName('otherstats')[target];
+    let others = document.getElementsByClassName('otherstats')[target];
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
 
     let copystats = 
@@ -177,22 +177,19 @@ async function parseProfile(player, target) {
     }%, ${round(player.xp / topXP * 100, 2)}% of ${topPlayer}`;
 
     // Add a click event listener to the span element
+    others = removeAllListeners(others); // update spam
     others.addEventListener('click', () => {
         // Create a temporary textarea element to copy the text to the clipboard
         const textarea = document.createElement('textarea');
         textarea.value = copystats;
         document.body.appendChild(textarea);
-
         // Select the text within the textarea
         textarea.select();
         textarea.setSelectionRange(0, 99999); // For mobile devices
-
         // Copy the selected text to the clipboard
         document.execCommand('copy');
-
         // Remove the temporary textarea
         document.body.removeChild(textarea);
-
         // Inform the user that the text has been copied (optional)
         alert(`Text has been copied to clipboard!\n\n${copystats}`);
     });
@@ -210,6 +207,13 @@ async function parseProfile(player, target) {
             timerIdVania = setInterval(() => countdown0(others, timerIdVania, player, "2024-12-23"), 1);
         }
     }
+}
+
+// Function to remove all event listeners from an element
+function removeAllListeners(element) {
+    const clonedElement = element.cloneNode(true);
+    element.replaceWith(clonedElement);
+    return clonedElement;
 }
 
 // APPEAL COOLDOWN
