@@ -172,7 +172,8 @@ async function parseProfile(player, target) {
     let copystats = 
     `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
     }, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
-    }, ${player.detailed_xp[0]}/${player.detailed_xp[1]} XP ${arrow.textContent} ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
+    }, ${player.detailed_xp[0]}/${player.detailed_xp[1]} XP ${arrow.textContent
+    } ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
     }, ${round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)
     }%, ${round(player.xp / topXP * 100, 2)}% of ${topPlayer}`;
 
@@ -619,12 +620,10 @@ function round(num, places) {
 }
 
 function getTime(time) {
-    // pink floyd - time
     return `${checkZero((time/1440 >> 0))}:${checkZero((time/60) % 24 >> 0)}:${checkZero(time%60)}:00`;
 }
 function checkZero(time) {
-    if (time < 10) {time = "0" + time};  // add zero in front of numbers < 10
-    return time;
+    return time < 10 ? `0${time}` : `${time}`;
 }
 
 function delay(ms) {
@@ -704,11 +703,6 @@ function destroyCards() {
     }
 }
 
-async function tests() {
-    
-}
-//tests();
-
 // work in progress
 function convertDivToImage() {
     const divElement = document.getElementsByClassName('rank-card')[0];
@@ -720,7 +714,7 @@ function convertDivToImage() {
     const scaledHeight = divElement.offsetHeight * scale;
     // Use html2canvas to capture the div element
     html2canvas(divElement, { 
-        scale: scale, proxy: 'https://html2canvas-proxy-nodejs.gdjkhp.repl.co/', backgroundColor: null
+        scale: scale, backgroundColor: null // proxy: 'https://html2canvas-proxy-nodejs.gdjkhp.repl.co/'
     }).then((canvas) => {
         // Create a scaled canvas element to preserve the higher resolution
         const scaledCanvas = document.createElement('canvas');
