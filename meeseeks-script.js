@@ -627,9 +627,9 @@ function checkZero(time) {
 }
 
 function delay(ms) {
-	return new Promise((resolve, reject) => {
-		setTimeout(resolve, ms);
-	});
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 function UrlExists(url) {
