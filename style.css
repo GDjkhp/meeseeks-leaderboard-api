@@ -31,8 +31,8 @@ body {
     border-radius: 50%;
     overflow: hidden;
     position: absolute;
-    height: 100px;
-    width: 100px;
+    height: 120px;
+    width: 120px;
 }
 .rank-card-avatar img {
     height: 100%;
@@ -114,7 +114,7 @@ body {
 .usernamegroup a:hover {
     text-decoration: underline;
 }
-.otherstats:hover {
+.otherstats:hover, .copy:hover {
     text-decoration: underline;
   }
 .discriminator {
@@ -196,4 +196,36 @@ td {
 }
 body *, :not(*) {
     cursor: url(https://i.imgur.com/nCXdGsA.png), auto;
+}
+.hiddengroup {
+    text-align: center;
+}
+/* Progress bar (custom) */
+.progress-custom {
+    background-color: red;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    position: relative; /* Add this */
+    z-index: 2;
+    border: #000 solid 1px;
+}
+.progress-bar-custom {
+    background-color: lime;
+    height: 100%;
+}
+.progress-percent-custom {
+    position: absolute; /* Add this */
+    right: 1%;
+    font-weight: bold;
+}
+.green-xp {
+    font-weight: bold;
+    color: lime;
+}
+.red-xp {
+    font-weight: bold;
+    color: red;
 }

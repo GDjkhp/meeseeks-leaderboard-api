@@ -119,13 +119,13 @@ async function parseProfile(player, target) {
     servername.innerHTML = result.guild.name;
 
     const percent = document.getElementsByClassName('progress-percent')[target];
-    percent.innerHTML = `${round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)}%`;
+    percent.innerHTML = `${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)}%`;
 
     const percent2 = document.getElementsByClassName('progress-percent2')[target];
-    percent2.innerHTML = `${round(player.xp / topXP * 100, 2)}%`;
+    percent2.innerHTML = `${round((player.xp / topXP) * 100, 2)}%`;
 
     const bar2 = document.getElementsByClassName('progress-bar2')[target];
-    bar2.style = `width: ${player.xp / topXP * 100}%;`;
+    bar2.style = `width: ${(player.xp / topXP) * 100}%;`;
 
     const a = document.createElement("a");
     a.href = `https://discord.com/users/${player.id}`;
@@ -174,12 +174,13 @@ async function parseProfile(player, target) {
     }, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
     }, ${player.detailed_xp[0]}/${player.detailed_xp[1]} XP ${arrow.textContent
     } ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
-    }, ${round(player.detailed_xp[0] / player.detailed_xp[1] * 100, 2)
-    }%, ${round(player.xp / topXP * 100, 2)}% of ${topPlayer}`;
+    }, ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
+    }%, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}`;
 
+    let copy = document.getElementsByClassName('copy')[target];
     // Add a click event listener to the span element
-    others = removeAllListeners(others); // update spam
-    others.addEventListener('click', () => {
+    copy = removeAllListeners(copy); // update spam
+    copy.addEventListener('click', () => {
         // Create a temporary textarea element to copy the text to the clipboard
         const textarea = document.createElement('textarea');
         textarea.value = copystats;
@@ -208,6 +209,61 @@ async function parseProfile(player, target) {
             timerIdVania = setInterval(() => countdown0(others, timerIdVania, player, "2024-12-23"), 1);
         }
     }
+
+    // update teehee
+    others = removeAllListeners(others); // update spam
+    others.addEventListener('click', () => {
+        const hidden = document.getElementsByClassName('hiddengroup')[target];
+        hidden.style.display = hidden.style.display == "none" ? "block" : "none"
+    });
+
+    const bar_custom = document.getElementsByClassName('progress-bar-custom')[target];
+    bar_custom.style = `width: ${((player.xp/getTotalXP(player.level+1))*100)}%;`;
+
+    const percent_custom = document.getElementsByClassName('progress-percent-custom')[target];
+    percent_custom.innerHTML = `${round((player.xp/getTotalXP(player.level+1)) * 100, 2)}%`;
+
+    const green_xp = document.getElementsByClassName('green-xp')[target];
+    const red_xp = document.getElementsByClassName('red-xp')[target];
+    green_xp.innerHTML = `${player.xp} / ${getTotalXP(player.level+1)} XP `;
+    red_xp.innerHTML = `(${getTotalXP(player.level+1)-player.xp} XP left)`;
+
+    let level_select = document.getElementsByClassName('level-select')[target];
+    level_select.value = player.level + 1;
+    level_select = removeAllListeners(level_select)
+    level_select.addEventListener('input', () => {
+        if (isNaN(level_select.value)) return;
+        console.log("specialz")
+        updateCustomStats(player.xp, getTotalXP(level_select.value), bar_custom, percent_custom, green_xp, red_xp);
+    });
+
+    let plus_button = document.getElementsByClassName('plus')[target];
+    let minus_button = document.getElementsByClassName('minus')[target];
+    plus_button = removeAllListeners(plus_button);
+    minus_button = removeAllListeners(minus_button);
+    plus_button.addEventListener('click', () => {
+        if (isNaN(level_select.value)) return;
+        console.log("deneb")
+        level_select.value++;
+        updateCustomStats(player.xp, getTotalXP(level_select.value), bar_custom, percent_custom, green_xp, red_xp);
+    });
+    minus_button.addEventListener('click', () => {
+        if (isNaN(level_select.value)) return;
+        console.log("spica")
+        level_select.value--;
+        updateCustomStats(player.xp, getTotalXP(level_select.value), bar_custom, percent_custom, green_xp, red_xp);
+    });
+}
+
+function updateCustomStats(current_xp, level_xp, progress_div, progress_percent, green, red) {
+    progress_div.style = `width: ${(current_xp/level_xp)*100}%`;
+    progress_percent.innerHTML = `${round((current_xp/level_xp) * 100, 2)}%`;
+    green.innerHTML = `${current_xp} / ${level_xp} XP `;
+    red.innerHTML = `(${level_xp - current_xp} XP left)`;
+}
+
+function getTotalXP(n) {
+    return (5 * (91 * n + 27 * n ** 2 + 2 * n ** 3)) / 6 // wolfram alpha widgets: sequence solver TODO: simplify?
 }
 
 // Function to remove all event listeners from an element
@@ -687,6 +743,20 @@ function addCard() {
                         <span class="servername"></span>
                     </span>
                 </div>
+            </div>
+            <div class="hiddengroup" style="display: none;">
+                <span class="copy">&boxbox; copy statistics</span>
+                <br>
+                <input type="text" value="0" class="level-select">
+                <br>
+                <input type="button" value="-" class="minus">
+                <input type="button" value="+" class="plus">
+                <div class="progress-custom">
+                    <div class="progress-bar-custom"></div>
+                    <span class="progress-percent-custom"></span>
+                </div>
+                <span class="green-xp">? / ? XP </span>
+                <span class="red-xp">(? XP left)</span>
             </div>
         </div>
     `;
