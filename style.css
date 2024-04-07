@@ -114,7 +114,7 @@ body {
 .usernamegroup a:hover {
     text-decoration: underline;
 }
-.otherstats:hover, .copy:hover {
+.otherstats:hover, .copy:hover, #json:hover, #wychee:hover {
     text-decoration: underline;
   }
 .discriminator {
