@@ -9,6 +9,7 @@ async function loadJSON(id) {
     // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     // result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
+    call_dev_details();
     if (page == 0) {
         topXP = result.players[0].xp;
         topPlayer = `${result.players[0].username}${result.players[0].discriminator == "0" ? "" : `#${result.players[0].discriminator}`}`;
@@ -255,6 +256,125 @@ async function parseProfile(player, target) {
     });
 }
 
+// json wychee obama
+const json_span = document.getElementById('json');
+json_span.addEventListener('click', () => {
+    copystats = JSON.stringify(result, null, 4);
+    // Create a temporary textarea element to copy the text to the clipboard
+    const textarea = document.createElement('textarea');
+    textarea.value = copystats;
+    document.body.appendChild(textarea);
+    // Select the text within the textarea
+    textarea.select();
+    textarea.setSelectionRange(0, 999999); // For mobile devices
+    // Copy the selected text to the clipboard
+    document.execCommand('copy');
+    // Remove the temporary textarea
+    document.body.removeChild(textarea);
+    // Inform the user that the text has been copied (optional)
+    alert(`Text has been copied to clipboard!\n\n${copystats}`);
+});
+
+const wychee_span = document.getElementById('wychee');
+wychee_span.addEventListener('click', () => {
+    copystats = result ? bulk_stats() : "desrouleaux";
+    // Create a temporary textarea element to copy the text to the clipboard
+    const textarea = document.createElement('textarea');
+    textarea.value = copystats;
+    document.body.appendChild(textarea);
+    // Select the text within the textarea
+    textarea.select();
+    textarea.setSelectionRange(0, 999999); // For mobile devices
+    // Copy the selected text to the clipboard
+    document.execCommand('copy');
+    // Remove the temporary textarea
+    document.body.removeChild(textarea);
+    // Inform the user that the text has been copied (optional)
+    alert(`Text has been copied to clipboard!\n\n${copystats}`);
+});
+
+// bulk wychee stats
+function bulk_stats() {
+    copy = ""
+    result.players.forEach(player => {
+        copy += 
+        `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
+        }, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
+        }, ${player.detailed_xp[0]}/${player.detailed_xp[1]
+        } XP ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
+        }, ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
+        }%, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}\n`;
+    });
+    return copy;
+}
+
+// dev details
+const dev = document.getElementById('dev');
+function dev_details() {
+    dev.style.display = dev.style.display != "none" ? "none" : "block";
+}
+
+function startTime() {
+	var today = new Date();
+	document.getElementById('time').innerHTML = strftime("%a %b %e %r %Y %Z", today);
+}
+
+function generate_roles() {
+    spans = ""
+    result.role_rewards.forEach(x => {
+        spans+=`<span style="color:${base16(x.role.color)}">${x.role.name} </span>`;
+    });
+    return spans;
+}
+
+function call_dev_details() {
+    startTime();
+    dev_banner = document.getElementById('dev-server-banner');
+    dev_img = document.getElementById('dev-server-img');
+    dev_name = document.getElementById('dev-server-name');
+
+    dev_premium = document.getElementById('premium');
+    // dev_allow_join = document.getElementById('allow-join');
+    // dev_invite = document.getElementById('invite-leaderboard');
+    dev_prefix = document.getElementById('commands-prefix');
+    dev_commands = document.getElementById('application-commands-enabled');
+    
+    dev_rate = document.getElementById('xp-rate');
+    dev_per_message = document.getElementById('xp-per-message');
+
+    // dev_plans = document.getElementById('display-plans');
+    // dev_subscribers = document.getElementById('showcase-subscribers');
+
+    // dev_member = document.getElementById('is-member');
+    dev_admin = document.getElementById('admin');
+    // dev_settings = document.getElementById('user-guild-settings');
+    // dev_levels_div = document.getElementById('mindfuck-resupply');
+    dev_roles = document.getElementById('role_rewards');
+
+    dev_banner.src = result.banner_url ? result.banner_url : "";
+    dev_banner.style.height = result.banner_url ? 64 : 0;
+    url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
+    dev_img.src = UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
+    dev_name.innerHTML = result.guild.name;
+
+    dev_premium.innerHTML = result.guild.premium;
+    // dev_allow_join.innerHTML = result.guild.allow_join;
+    // dev_invite.innerHTML = result.guild.invite_leaderboard;
+    dev_prefix.innerHTML = result.guild.commands_prefix;
+    dev_commands.innerHTML = result.guild.application_commands_enabled;
+
+    dev_rate.innerHTML = result.xp_rate;
+    dev_per_message.innerHTML = `${result.xp_per_message[0]}-${result.xp_per_message[1]}`;
+
+    // dev_plans.innerHTML = result.monetize_options.display_plans;
+    // dev_subscribers.innerHTML = result.monetize_options.showcase_subscribers;
+
+    // dev_member.innerHTML = result.is_member;
+    dev_admin.innerHTML = result.admin;
+    // dev_settings.innerHTML = result.user_guild_settings;
+    dev_roles.innerHTML = generate_roles();
+}
+
 function updateCustomStats(current_xp, level_xp, progress_div, progress_percent, green, red) {
     progress_div.style = `width: ${(current_xp/level_xp)*100}%`;
     progress_percent.innerHTML = `${round((current_xp/level_xp) * 100, 2)}%`;
@@ -262,6 +382,7 @@ function updateCustomStats(current_xp, level_xp, progress_div, progress_percent,
     red.innerHTML = `(${level_xp - current_xp} XP left)`;
 }
 
+// TODO: use this to calculate messages left?
 function getTotalXP(n) {
     return (5 * (91 * n + 27 * n ** 2 + 2 * n ** 3)) / 6 // wolfram alpha widgets: sequence solver TODO: simplify?
 }

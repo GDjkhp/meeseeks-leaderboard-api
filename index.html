@@ -41,12 +41,87 @@ thank you everyone for using them
         <input type="button" value="&#x274C;" id="stop" onclick="halt();">
         <input type="button" value="&#x2753;" onclick="details();">
         <input type="button" value="&#x1F4BE;" onclick="convertDivToImage();">
+        <input type="button" value="&#129323;" onclick="dev_details();">
         <br>
         <textarea value="" id="name" style="height: 0;"></textarea>
         <br>
         <input type="button" value="Parse" id="text" onclick="parse();" style="height: 32px;">
         <br>
         <span id="timer" style="font-weight: bold;">01:00.00</span>
+        <div id="dev" style="display: none;">
+            <span id="json">&boxbox; copy json</span>
+            <span id="wychee">&boxbox; pretty print</span>
+            <br>
+            <span>time fetched:</span>
+            <br>
+            <span id="time">null</span>
+            <br>
+            <details>
+                <summary>server data</summary>
+                <img id="dev-server-img" width="16">
+                <span id="dev-server-name"></span>
+                <br>
+                <img id="dev-server-banner">
+                <table class="params">
+                    <tr>
+                        <th>premium</th>
+                        <td id="premium"></td>
+                    </tr>
+                    <!-- <tr>
+                        <th>allow_join</th>
+                        <td id="allow-join"></td>
+                    </tr>
+                    <tr>
+                        <th>invite_leaderboard</th>
+                        <td id="invite-leaderboard"></td>
+                    </tr> -->
+                    <tr>
+                        <th>commands_prefix</th>
+                        <td id="commands-prefix"></td>
+                    </tr>
+                    <tr>
+                        <th>application_commands_enabled</th>
+                        <td id="application-commands-enabled"></td>
+                    </tr>
+                    <tr>
+                        <th>xp_rate</th>
+                        <td id="xp-rate"></td>
+                    </tr>
+                    <tr>
+                        <th>xp_per_message</th>
+                        <td id="xp-per-message"></td>
+                    </tr>
+                    <!-- <tr>
+                        <th>display_plans</th>
+                        <td id="display-plans"></td>
+                    </tr>
+                    <tr>
+                        <th>showcase_subscribers</th>
+                        <td id="showcase-subscribers"></td>
+                    </tr> -->
+                    <!-- <tr>
+                        <th>is_member</th>
+                        <td id="is-member"></td>
+                    </tr> -->
+                    <tr>
+                        <th>admin</th>
+                        <td id="admin"></td>
+                    </tr>
+                    <!-- <tr>
+                        <th>user_guild_settings</th>
+                        <td id="user-guild-settings"></td>
+                    </tr> -->
+                    <tr>
+                        <th>role_rewards</th>
+                        <td id="role_rewards"></td>
+                    </tr>
+                </table>
+                <!-- <details>
+                    <summary>level roles</summary>
+                    <div id="mindfuck-resupply"></div>
+                </details> -->
+            </details>
+        </div>
         <div id="foot" style="display: none;">
             <table class="params">
                 <tr>
@@ -98,5 +173,6 @@ thank you everyone for using them
         <!-- <p>hello darkness my old friend</p> -->
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <script src="strftime.js"></script>
     <script src="meeseeks-script.js"></script>
 </body>
