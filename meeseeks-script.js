@@ -197,6 +197,26 @@ async function parseProfile(player, target) {
         alert(`Text has been copied to clipboard!\n\n${copystats}`);
     });
 
+    let link_embed = document.getElementsByClassName('copylink')[target];
+    // Add a click event listener to the span element
+    link_embed = removeAllListeners(link_embed); // update spam
+    link_embed.addEventListener('click', () => {
+        copystats = `https://gdjkhp.github.io/meeseeks-leaderboard-api/?server=${result.guild.id}&player=${player.id}`
+        // Create a temporary textarea element to copy the text to the clipboard
+        const textarea = document.createElement('textarea');
+        textarea.value = copystats;
+        document.body.appendChild(textarea);
+        // Select the text within the textarea
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+        // Copy the selected text to the clipboard
+        document.execCommand('copy');
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
+        // Inform the user that the text has been copied (optional)
+        alert(`Text has been copied to clipboard!\n\n${copystats}`);
+    });
+
     // banned members support
     if (serverId == "398627612299362304") {
         // if (player.id == "729554186777133088") {
@@ -651,6 +671,13 @@ function reset() {
     timerId = setInterval(countdown, 1);
 }
 
+// halt
+var stop1 = document.getElementById('stop');
+stop1.disabled = true;
+function halt() {
+    parseButton.disabled = false; turing = true; stop1.disabled = true;
+}
+
 // real main
 async function parseReal(server, input) {
     try {
@@ -731,13 +758,6 @@ function pingpong() {
     }
 }
 pingpong();
-
-// halt
-var stop1 = document.getElementById('stop');
-stop1.disabled = true;
-function halt() {
-    parseButton.disabled = false; turing = true; stop1.disabled = true;
-}
 
 // details
 const group = document.getElementById('foot');
@@ -867,6 +887,7 @@ function addCard() {
             </div>
             <div class="hiddengroup" style="display: none;">
                 <span class="copy">&boxbox; copy statistics</span>
+                <span class="copylink">&boxbox; copy link</span>
                 <br>
                 <input type="text" value="0" class="level-select">
                 <br>
