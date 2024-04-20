@@ -179,43 +179,12 @@ async function parseProfile(player, target) {
     }%, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}`;
 
     let copy = document.getElementsByClassName('copy')[target];
-    // Add a click event listener to the span element
     copy = removeAllListeners(copy); // update spam
-    copy.addEventListener('click', () => {
-        // Create a temporary textarea element to copy the text to the clipboard
-        const textarea = document.createElement('textarea');
-        textarea.value = copystats;
-        document.body.appendChild(textarea);
-        // Select the text within the textarea
-        textarea.select();
-        textarea.setSelectionRange(0, 99999); // For mobile devices
-        // Copy the selected text to the clipboard
-        document.execCommand('copy');
-        // Remove the temporary textarea
-        document.body.removeChild(textarea);
-        // Inform the user that the text has been copied (optional)
-        alert(`Text has been copied to clipboard!\n\n${copystats}`);
-    });
+    clipboard_hack(copy, copystats);
 
     let link_embed = document.getElementsByClassName('copylink')[target];
-    // Add a click event listener to the span element
     link_embed = removeAllListeners(link_embed); // update spam
-    link_embed.addEventListener('click', () => {
-        copystats = `https://gdjkhp.github.io/meeseeks-leaderboard-api/?server=${result.guild.id}&player=${player.id}`
-        // Create a temporary textarea element to copy the text to the clipboard
-        const textarea = document.createElement('textarea');
-        textarea.value = copystats;
-        document.body.appendChild(textarea);
-        // Select the text within the textarea
-        textarea.select();
-        textarea.setSelectionRange(0, 99999); // For mobile devices
-        // Copy the selected text to the clipboard
-        document.execCommand('copy');
-        // Remove the temporary textarea
-        document.body.removeChild(textarea);
-        // Inform the user that the text has been copied (optional)
-        alert(`Text has been copied to clipboard!\n\n${copystats}`);
-    });
+    clipboard_hack(link_embed, `https://gdjkhp.github.io/meeseeks-leaderboard-api/?server=${result.guild.id}&player=${player.id}`);
 
     // banned members support
     if (serverId == "398627612299362304") {
@@ -276,42 +245,24 @@ async function parseProfile(player, target) {
     });
 }
 
-// json wychee obama
-const json_span = document.getElementById('json');
-json_span.addEventListener('click', () => {
-    copystats = JSON.stringify(result, null, 4);
-    // Create a temporary textarea element to copy the text to the clipboard
-    const textarea = document.createElement('textarea');
-    textarea.value = copystats;
-    document.body.appendChild(textarea);
-    // Select the text within the textarea
-    textarea.select();
-    textarea.setSelectionRange(0, 999999); // For mobile devices
-    // Copy the selected text to the clipboard
-    document.execCommand('copy');
-    // Remove the temporary textarea
-    document.body.removeChild(textarea);
-    // Inform the user that the text has been copied (optional)
-    alert(`Text has been copied to clipboard!\n\n${copystats}`);
-});
-
-const wychee_span = document.getElementById('wychee');
-wychee_span.addEventListener('click', () => {
-    copystats = result ? bulk_stats() : "desrouleaux";
-    // Create a temporary textarea element to copy the text to the clipboard
-    const textarea = document.createElement('textarea');
-    textarea.value = copystats;
-    document.body.appendChild(textarea);
-    // Select the text within the textarea
-    textarea.select();
-    textarea.setSelectionRange(0, 999999); // For mobile devices
-    // Copy the selected text to the clipboard
-    document.execCommand('copy');
-    // Remove the temporary textarea
-    document.body.removeChild(textarea);
-    // Inform the user that the text has been copied (optional)
-    alert(`Text has been copied to clipboard!\n\n${copystats}`);
-});
+// Add a click event listener to the span element
+function clipboard_hack(tag, str) {
+    tag.addEventListener('click', () => {
+        // Create a temporary textarea element to copy the text to the clipboard
+        const textarea = document.createElement('textarea');
+        textarea.value = str;
+        document.body.appendChild(textarea);
+        // Select the text within the textarea
+        textarea.select();
+        textarea.setSelectionRange(0, 999999); // For mobile devices
+        // Copy the selected text to the clipboard
+        document.execCommand('copy');
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
+        // Inform the user that the text has been copied (optional)
+        alert(`Text has been copied to clipboard!\n\n${str}`);
+    });
+}
 
 // bulk wychee stats
 function bulk_stats() {
@@ -698,6 +649,15 @@ async function parseServer(id) {
     if (serverId != "") await loadJSON(serverId);
     setLink("link", `https://mee6.xyz/api/plugins/levels/leaderboard/${serverId}`);
     setLink("linker", `https://mee6.xyz/leaderboard/${serverId}`);
+    
+    // json wychee obama
+    let json_span = document.getElementById('json');
+    json_span = removeAllListeners(json_span);
+    clipboard_hack(json_span, JSON.stringify(result, null, 4));
+
+    let wychee_span = document.getElementById('wychee');
+    wychee_span = removeAllListeners(wychee_span);
+    clipboard_hack(wychee_span, result ? bulk_stats() : "desrouleaux");
 }
 
 async function parseInput(buffer) {
@@ -915,7 +875,7 @@ function destroyCards() {
     }
 }
 
-// work in progress
+// work in progress (discontinued)
 function convertDivToImage() {
     const divElement = document.getElementsByClassName('rank-card')[0];
     if (divElement == null) return;
