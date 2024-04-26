@@ -102,7 +102,7 @@ async function parseProfile(player, target) {
     bar.style = `width: ${((player.detailed_xp[0]/player.detailed_xp[1])*100)}%; background-color: ${color};`;
 
     const avatar = document.getElementsByClassName('avatar')[target];
-    const url = `https://cdn.discordapp.com/avatars/${player.id}/${player.avatar}`;
+    const url = `https://cdn.discordapp.com/avatars/${player.id}/${player.avatar}?size=1024`;
     const isActive = UrlExists(url);
     avatar.src = player.avatar != "" && isActive ? url : "https://gdjkhp.github.io/img/dc.png";
 
@@ -113,7 +113,7 @@ async function parseProfile(player, target) {
     }
     
     const servericon = document.getElementsByClassName('serverpng')[target];
-    const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
+    const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}?size=1024`;
     servericon.src = UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
 
     const servername = document.getElementsByClassName('servername')[target];
@@ -324,7 +324,7 @@ function call_dev_details() {
 
     dev_banner.src = result.banner_url ? result.banner_url : "";
     dev_banner.style.height = result.banner_url ? 64 : 0;
-    url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}`;
+    url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}?size=1024`;
     dev_img.src = UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
     dev_name.innerHTML = result.guild.name;
 
