@@ -170,13 +170,7 @@ async function parseProfile(player, target) {
     let others = document.getElementsByClassName('otherstats')[target];
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
 
-    let copystats = 
-    `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
-    }, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
-    }, ${player.detailed_xp[0]}/${player.detailed_xp[1]} XP ${arrow.textContent
-    } ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
-    }, ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
-    }%, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}`;
+    let copystats = real_stats_format(player);
 
     let copy = document.getElementsByClassName('copy')[target];
     copy = removeAllListeners(copy); // update spam
@@ -265,16 +259,20 @@ function clipboard_hack(tag, str) {
 }
 
 // bulk wychee stats
+function real_stats_format(player) {
+    return `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
+    }, ${player.detailed_xp[0]}/${player.detailed_xp[1]
+    } XP ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
+    }%, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
+    }, ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
+    } messages of ${getTotalXP(player.level+1)-player.xp} XP left till LEVEL ${player.level+1
+    }, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}\n`;
+}
+
 function bulk_stats() {
     copy = ""
     result.players.forEach(player => {
-        copy += 
-        `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
-        }, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
-        }, ${player.detailed_xp[0]}/${player.detailed_xp[1]
-        } XP ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
-        }, ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
-        }%, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}\n`;
+        copy += real_stats_format(player);
     });
     return copy;
 }
