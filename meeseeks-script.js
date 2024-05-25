@@ -265,7 +265,7 @@ function real_stats_format(player) {
     } XP ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
     }%, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
     }, ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
-    } messages of ${getTotalXP(player.level+1)-player.xp} XP left till LEVEL ${player.level+1
+    } msg of ${getTotalXP(player.level+1)-player.xp} XP left till LEVEL ${player.level+1
     }, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}\n`;
 }
 
@@ -873,7 +873,6 @@ function destroyCards() {
     }
 }
 
-// work in progress (discontinued)
 function convertDivToImage() {
     const divElement = document.getElementsByClassName('rank-card')[0];
     if (divElement == null) return;
@@ -884,7 +883,7 @@ function convertDivToImage() {
     const scaledHeight = divElement.offsetHeight * scale;
     // Use html2canvas to capture the div element
     html2canvas(divElement, { 
-        scale: scale, backgroundColor: null // proxy: 'https://html2canvas-proxy-nodejs.gdjkhp.repl.co/'
+        scale: scale, backgroundColor: null, useCORS: true
     }).then((canvas) => {
         // Create a scaled canvas element to preserve the higher resolution
         const scaledCanvas = document.createElement('canvas');
