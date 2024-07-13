@@ -229,3 +229,6 @@ body *, :not(*) {
     font-weight: bold;
     color: red;
 }
+.progress-segment {
+    height: 100%;
+}

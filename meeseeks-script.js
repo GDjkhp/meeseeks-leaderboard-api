@@ -5,11 +5,8 @@ result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = fa
 async function loadJSON(id) {
     if (turing) return;
     result = await fetch(`${cors}${id}?limit=1000&page=${page}`).then(res => res.json());
-    // result = await fetch(`https://meeseeks-api.gdjkhp.repl.co/${id}?limit=1000&page=${page}`).then(res => res.json());
-    // result = await fetch(`https://cors-anywhere.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
-    // result = await fetch(`https://cors.gdjkhp.repl.co/mee6.xyz/api/plugins/levels/leaderboard/${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
-    call_dev_details();
+    await call_dev_details();
     if (page == 0) {
         topXP = result.players[0].xp;
         topPlayer = `${result.players[0].username}${result.players[0].discriminator == "0" ? "" : `#${result.players[0].discriminator}`}`;
@@ -20,9 +17,6 @@ async function loadJSON(id) {
 // load custom server id + pre defined servers
 function load(sel) {
     if (isFinite(sel)) return serverId = sel;
-    // geometrydash: 398627612299362304
-    // minecraft: 302094807046684672
-    // terraria: 251072485095636994
     // query: ?limit=1000&page=1
     switch(sel) {
         case "gmd":
@@ -103,7 +97,7 @@ async function parseProfile(player, target) {
 
     const avatar = document.getElementsByClassName('avatar')[target];
     const url = `https://cdn.discordapp.com/avatars/${player.id}/${player.avatar}${highres ? "?size=1024" : ""}`;
-    const isActive = UrlExists(url);
+    const isActive = await UrlExists(url);
     avatar.src = player.avatar != "" && isActive ? url : "https://gdjkhp.github.io/img/dc.png";
 
     if (player.avatar != null && !isActive) {
@@ -114,7 +108,7 @@ async function parseProfile(player, target) {
     
     const servericon = document.getElementsByClassName('serverpng')[target];
     const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}${highres ? "?size=1024" : ""}`;
-    servericon.src = UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
+    servericon.src = await UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
 
     const servername = document.getElementsByClassName('servername')[target];
     servername.innerHTML = result.guild.name;
@@ -129,14 +123,12 @@ async function parseProfile(player, target) {
     bar2.style = `width: ${(player.xp / topXP) * 100}%;`;
 
     const a = document.createElement("a");
-    a.href = `https://discord.com/users/${player.id}`;
-    a.target = "discord"; // bug: doesn't reuse the loaded tab
+    a.href = `discord://discord.com/users/${player.id}`;
     avatar.parentNode.insertBefore(a, avatar);
     a.appendChild(avatar);
 
     const a2 = document.createElement("a");
-    a2.href = `https://discord.com/users/${player.id}`;
-    a2.target = "discord"; // bug: doesn't reuse the loaded tab
+    a2.href = `discord://discord.com/users/${player.id}`;
     const usernamegroup = document.getElementsByClassName('username')[target];
     usernamegroup.parentNode.insertBefore(a2, usernamegroup);
     a2.appendChild(usernamegroup);
@@ -203,6 +195,52 @@ async function parseProfile(player, target) {
 
     const bar_custom = document.getElementsByClassName('progress-bar-custom')[target];
     bar_custom.style = `width: ${((player.xp/getTotalXP(player.level+1))*100)}%;`;
+
+    // TODO: role color segments
+    // const roleRewards = [
+    //     { rank: 3, role: { color: 9807270 } },
+    //     { rank: 5, role: { color: 12397459 } },
+    //     { rank: 10, role: { color: 13379956 } },
+    //     { rank: 20, role: { color: 14231373 } },
+    //     { rank: 30, role: { color: 14693677 } },
+    //     { rank: 40, role: { color: 15099956 } },
+    //     { rank: 50, role: { color: 15440443 } },
+    //     { rank: 60, role: { color: 15780930 } },
+    //     { rank: 70, role: { color: 15529034 } },
+    //     { rank: 80, role: { color: 13105234 } },
+    //     { rank: 90, role: { color: 10746971 } },
+    //     { rank: 100, role: { color: 8650596 } }
+    // ];
+
+    // const barCustom = document.getElementsByClassName('progress-custom')[target];
+    // // barCustom.innerHTML = ''; // Clear any existing segments
+
+    // let somethingPercentage = 0;
+
+    // roleRewards.forEach((reward) => {
+    //     if (player.level >= reward.rank) {
+    //         const segmentPercentage = (getTotalXP(reward.rank)/player.xp)*100;
+    //         role = getRole(player.level)
+    //         console.log(role.rank)
+    //         if (role != null && role.rank != reward.rank) {
+    //             if (segmentPercentage > 0) {
+    //                 const segmentDiv = document.createElement('div');
+    //                 segmentDiv.className = 'progress-segment';
+    //                 segmentDiv.style.width = `${segmentPercentage}%`;
+    //                 segmentDiv.style.backgroundColor = base16(reward.role.color);
+    //                 barCustom.appendChild(segmentDiv);
+    //                 somethingPercentage = segmentPercentage;
+    //             }
+    //         }
+    //     }
+    // });
+
+    // console.log(somethingPercentage)
+    // const remainingSegment = document.createElement('div');
+    // remainingSegment.className = 'progress-segment';
+    // remainingSegment.style.width = `${somethingPercentage}%`;
+    // remainingSegment.style.backgroundColor = color; // Default color for the remaining percentage
+    // barCustom.appendChild(remainingSegment);
 
     const percent_custom = document.getElementsByClassName('progress-percent-custom')[target];
     percent_custom.innerHTML = `${round((player.xp/getTotalXP(player.level+1)) * 100, 2)}%`;
@@ -296,7 +334,7 @@ function generate_roles() {
     return spans;
 }
 
-function call_dev_details() {
+async function call_dev_details() {
     startTime();
     dev_banner = document.getElementById('dev-server-banner');
     dev_img = document.getElementById('dev-server-img');
@@ -323,7 +361,7 @@ function call_dev_details() {
     dev_banner.src = result.banner_url ? result.banner_url : "";
     dev_banner.style.height = result.banner_url ? 64 : 0;
     url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}${highres ? "?size=1024" : ""}`;
-    dev_img.src = UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
+    dev_img.src = await UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
     dev_name.innerHTML = result.guild.name;
 
     dev_premium.innerHTML = result.guild.premium;
@@ -706,8 +744,8 @@ embed();
 
 // FIXME: server status
 const ping = document.getElementById('status');
-function pingpong() {
-    if (UrlExists(`${cors}398627612299362304`)) {
+async function pingpong() {
+    if (await UrlExists(`${cors}398627612299362304`)) {
         ping.innerHTML = "online";
         ping.style = "font-weight: bold; color: lime;";
     } else {
@@ -753,20 +791,21 @@ function OnInput() {
     this.style.height = (this.scrollHeight) + "px";
 }
 
-function getRoleColor(level) {
+function getRole(level) {
     const roles_rewards = result.role_rewards;
     for (let i = roles_rewards.length - 1; i >= 0; i--) {
         const element = roles_rewards[i];
-        if (element.rank <= level) return base16(element.role.color);
+        if (element.rank <= level) return element;
     }
+}
+
+function getRoleColor(level) {
+    role = getRole(level);
+    if (role != null) return base16(role.role.color);
     return "white";
 }
 function base16(num) {
-    let hex = num.toString(16);
-    while (hex.length < 6) {
-        hex = "0" + hex;
-    }
-    return hex;
+    return `#${num.toString(16).padStart(6, '0')}`;
 }
 
 function round(num, places) {
@@ -787,18 +826,14 @@ function delay(ms) {
     });
 }
 
-function UrlExists(url) {
-    var http = new XMLHttpRequest();
-    http.open('HEAD', url, false);
+async function UrlExists(url) {
     try {
-        http.send();
+        const response = await fetch(url);
+        return response.ok; // Returns true if the request was successful
     } catch (error) {
         console.log(error);
         return false;
     }
-    if (http.status != 404)
-        return true;
-    return false;
 }
 
 // card utils
