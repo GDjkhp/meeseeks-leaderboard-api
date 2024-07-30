@@ -1,7 +1,7 @@
 var cors = "https://corsproxy.io/?https://mee6.xyz/api/plugins/levels/leaderboard/", 
 result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP, topPlayer, highres = false;
 
-// cors unblocked api server, please don't abuse (rate limited, can ban my server's ip address), delays 500ms
+// cors unblocked api server, please don't abuse (rate limited, can ip ban the server, delays 500ms)
 async function loadJSON(id) {
     if (turing) return;
     result = await fetch(`${cors}${id}?limit=1000&page=${page}`).then(res => res.json());
@@ -157,7 +157,7 @@ async function parseProfile(player, target) {
 
     const msg = document.getElementsByClassName('progress-label-msg')[target];
     msg.style.color = luckColor;
-    msg.innerHTML = `${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)}`;
+    msg.innerHTML = `${Math.ceil((player.detailed_xp[1]-player.detailed_xp[0])/20)}`;
 
     let others = document.getElementsByClassName('otherstats')[target];
     others.innerHTML = `Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)}`;
@@ -194,53 +194,8 @@ async function parseProfile(player, target) {
     });
 
     const bar_custom = document.getElementsByClassName('progress-bar-custom')[target];
-    bar_custom.style = `width: ${((player.xp/getTotalXP(player.level+1))*100)}%;`;
-
-    // TODO: role color segments
-    // const roleRewards = [
-    //     { rank: 3, role: { color: 9807270 } },
-    //     { rank: 5, role: { color: 12397459 } },
-    //     { rank: 10, role: { color: 13379956 } },
-    //     { rank: 20, role: { color: 14231373 } },
-    //     { rank: 30, role: { color: 14693677 } },
-    //     { rank: 40, role: { color: 15099956 } },
-    //     { rank: 50, role: { color: 15440443 } },
-    //     { rank: 60, role: { color: 15780930 } },
-    //     { rank: 70, role: { color: 15529034 } },
-    //     { rank: 80, role: { color: 13105234 } },
-    //     { rank: 90, role: { color: 10746971 } },
-    //     { rank: 100, role: { color: 8650596 } }
-    // ];
-
-    // const barCustom = document.getElementsByClassName('progress-custom')[target];
-    // // barCustom.innerHTML = ''; // Clear any existing segments
-
-    // let somethingPercentage = 0;
-
-    // roleRewards.forEach((reward) => {
-    //     if (player.level >= reward.rank) {
-    //         const segmentPercentage = (getTotalXP(reward.rank)/player.xp)*100;
-    //         role = getRole(player.level)
-    //         console.log(role.rank)
-    //         if (role != null && role.rank != reward.rank) {
-    //             if (segmentPercentage > 0) {
-    //                 const segmentDiv = document.createElement('div');
-    //                 segmentDiv.className = 'progress-segment';
-    //                 segmentDiv.style.width = `${segmentPercentage}%`;
-    //                 segmentDiv.style.backgroundColor = base16(reward.role.color);
-    //                 barCustom.appendChild(segmentDiv);
-    //                 somethingPercentage = segmentPercentage;
-    //             }
-    //         }
-    //     }
-    // });
-
-    // console.log(somethingPercentage)
-    // const remainingSegment = document.createElement('div');
-    // remainingSegment.className = 'progress-segment';
-    // remainingSegment.style.width = `${somethingPercentage}%`;
-    // remainingSegment.style.backgroundColor = color; // Default color for the remaining percentage
-    // barCustom.appendChild(remainingSegment);
+    // bar_custom.style = `width: ${((player.xp/getTotalXP(player.level+1))*100)}%;`;
+    segs(player, bar_custom, player.level+1)
 
     const percent_custom = document.getElementsByClassName('progress-percent-custom')[target];
     percent_custom.innerHTML = `${round((player.xp/getTotalXP(player.level+1)) * 100, 2)}%`;
@@ -248,7 +203,7 @@ async function parseProfile(player, target) {
     const green_xp = document.getElementsByClassName('green-xp')[target];
     const red_xp = document.getElementsByClassName('red-xp')[target];
     green_xp.innerHTML = `${player.xp} / ${getTotalXP(player.level+1)} XP `;
-    red_xp.innerHTML = `(${getTotalXP(player.level+1)-player.xp} XP left)`;
+    red_xp.innerHTML = `(${getTotalXP(player.level+1)-player.xp} XP of ${Math.ceil((getTotalXP(player.level+1)-player.xp)/20)} msg left)`;
 
     let level_select = document.getElementsByClassName('level-select')[target];
     level_select.value = player.level + 1;
@@ -256,7 +211,7 @@ async function parseProfile(player, target) {
     level_select.addEventListener('input', () => {
         if (isNaN(level_select.value)) return;
         console.log("specialz")
-        updateCustomStats(player.xp, getTotalXP(level_select.value), bar_custom, percent_custom, green_xp, red_xp);
+        updateCustomStats(player, level_select.value, bar_custom, percent_custom, green_xp, red_xp);
     });
 
     let plus_button = document.getElementsByClassName('plus')[target];
@@ -267,13 +222,13 @@ async function parseProfile(player, target) {
         if (isNaN(level_select.value)) return;
         console.log("deneb")
         level_select.value++;
-        updateCustomStats(player.xp, getTotalXP(level_select.value), bar_custom, percent_custom, green_xp, red_xp);
+        updateCustomStats(player, level_select.value, bar_custom, percent_custom, green_xp, red_xp);
     });
     minus_button.addEventListener('click', () => {
         if (isNaN(level_select.value)) return;
         console.log("spica")
         level_select.value--;
-        updateCustomStats(player.xp, getTotalXP(level_select.value), bar_custom, percent_custom, green_xp, red_xp);
+        updateCustomStats(player, level_select.value, bar_custom, percent_custom, green_xp, red_xp);
     });
 }
 
@@ -296,14 +251,56 @@ function clipboard_hack(tag, str) {
     });
 }
 
+// role color segments thank you claude
+function segs(player, barCustom, nextLevel) {
+    const roleRewards = result.role_rewards;
+    barCustom.innerHTML = '' // Clear any existing segments
+    let completedXP = 0;
+    let totalPercentage = 0;
+
+    roleRewards.forEach((reward, index) => {
+        if (player.level >= reward.rank) {
+            const nextReward = roleRewards[index + 1] || { rank: player.level + 1 };
+            const segmentXP = getTotalXP(Math.min(player.level, nextReward.rank - 1)) - getTotalXP(reward.rank);
+            const segmentPercentage = (segmentXP / getTotalXP(nextLevel)) * 100;
+
+            if (segmentPercentage > 0) {
+                const segmentDiv = document.createElement('div');
+                segmentDiv.className = 'progress-segment';
+                segmentDiv.style.width = `${segmentPercentage}%`;
+                totalPercentage += segmentPercentage;
+                segmentDiv.style.backgroundColor = getRoleColor(reward.rank);
+                barCustom.appendChild(segmentDiv);
+            }
+
+            completedXP += segmentXP;
+        }
+    });
+    // console.log(`Total percentage: ${totalPercentage.toFixed(2)}%`);
+
+    // Add remaining progress for the current level
+    const remainingXP = player.xp - completedXP;
+    const remainingPercentage = (remainingXP / getTotalXP(nextLevel)) * 100;
+    if (remainingPercentage > 0) {
+        const remainingDiv = document.createElement('div');
+        remainingDiv.className = 'progress-segment';
+        remainingDiv.style.width = `${remainingPercentage}%`;
+        remainingDiv.style.backgroundColor = getRoleColor(player.level);
+        barCustom.appendChild(remainingDiv);
+    }
+
+    totalPercentage += remainingPercentage;
+    // console.log(`Final total percentage: ${totalPercentage.toFixed(2)}%`);
+}
+
 // bulk wychee stats
 function real_stats_format(player) {
     return `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
     }, ${player.detailed_xp[0]}/${player.detailed_xp[1]
     } XP ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
     }%, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
-    }, ${Math.ceil((5*Math.pow(player.level,2)+50*player.level+100-(player.detailed_xp[0]))/20)
-    } msg of ${getTotalXP(player.level+1)-player.xp} XP left till LEVEL ${player.level+1
+    }, ${getTotalXP(player.level+1)-player.xp} XP of ${Math.ceil((player.detailed_xp[1]-player.detailed_xp[0])/20)
+    } msg left till LEVEL ${player.level+1
     }, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}\n`;
 }
 
@@ -382,16 +379,17 @@ async function call_dev_details() {
     dev_roles.innerHTML = generate_roles();
 }
 
-function updateCustomStats(current_xp, level_xp, progress_div, progress_percent, green, red) {
-    progress_div.style = `width: ${(current_xp/level_xp)*100}%`;
-    progress_percent.innerHTML = `${round((current_xp/level_xp) * 100, 2)}%`;
-    green.innerHTML = `${current_xp} / ${level_xp} XP `;
-    red.innerHTML = `(${level_xp - current_xp} XP left)`;
+function updateCustomStats(player, nextLevel, progress_div, progress_percent, green, red) {
+    // progress_div.style = `width: ${(player.xp/getTotalXP(nextLevel))*100}%`;
+    segs(player, progress_div, nextLevel)
+    progress_percent.innerHTML = `${round((player.xp/getTotalXP(nextLevel)) * 100, 2)}%`;
+    green.innerHTML = `${player.xp} / ${getTotalXP(nextLevel)} XP `;
+    red.innerHTML = `(${getTotalXP(nextLevel) - player.xp} XP of ${Math.ceil((getTotalXP(nextLevel)-player.xp)/20)} msg left)`;
 }
 
 // TODO: use this to calculate messages left?
 function getTotalXP(n) {
-    return (5 * (91 * n + 27 * n ** 2 + 2 * n ** 3)) / 6 // wolfram alpha widgets: sequence solver TODO: simplify?
+    return (5 * (91 * n + 27 * n ** 2 + 2 * n ** 3)) / 6 // wolfram alpha widgets: sequence solver
 }
 
 // Function to remove all event listeners from an element
@@ -742,7 +740,7 @@ async function embed() {
 }
 embed();
 
-// FIXME: server status
+// server status
 const ping = document.getElementById('status');
 async function pingpong() {
     if (await UrlExists(`${cors}398627612299362304`)) {

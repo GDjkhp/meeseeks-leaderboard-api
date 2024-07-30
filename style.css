@@ -213,8 +213,11 @@ body *, :not(*) {
     border: #000 solid 1px;
 }
 .progress-bar-custom {
-    background-color: lime;
+    background-color: var(--secondary-color);
     height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
 }
 .progress-percent-custom {
     position: absolute; /* Add this */
