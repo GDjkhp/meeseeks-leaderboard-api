@@ -260,7 +260,7 @@ function segs(player, barCustom, nextLevel) {
 
     roleRewards.forEach((reward, index) => {
         if (player.level >= reward.rank) {
-            const nextReward = roleRewards[index + 1];
+            const nextReward = roleRewards[index + 1] || { rank: player.level + 1 };
             const segmentXP = getTotalXP(Math.min(player.level, nextReward.rank)) - getTotalXP(reward.rank);
             const segmentPercentage = (segmentXP / getTotalXP(nextLevel)) * 100;
 
