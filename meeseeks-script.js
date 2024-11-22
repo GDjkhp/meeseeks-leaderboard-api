@@ -174,11 +174,11 @@ async function parseProfile(player, target) {
 
     // banned members support
     if (serverId == "398627612299362304") {
-        // if (player.id == "729554186777133088") {
-        //     let timerIdGDjkhp;
-        //     clearInterval(timerIdGDjkhp);
-        //     timerIdGDjkhp = setInterval(() => countdown0(others, timerIdGDjkhp, player, "2023-10-26"), 1);
-        // }
+        if (player.id == "729554186777133088") {
+            let timerIdGDjkhp;
+            clearInterval(timerIdGDjkhp);
+            timerIdGDjkhp = setInterval(() => countdown0(others, timerIdGDjkhp, player, "2025-06-17"), 1);
+        }
         if (player.id == "1003633156408229959") {
             let timerIdVania;
             clearInterval(timerIdVania);
