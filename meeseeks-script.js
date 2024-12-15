@@ -743,7 +743,7 @@ embed();
 // server status
 const ping = document.getElementById('status');
 async function pingpong() {
-    if (await UrlExists(`${cors}398627612299362304`)) {
+    if (await UrlExists(`${cors}398627612299362304?limit=1`)) {
         ping.innerHTML = "online";
         ping.style = "font-weight: bold; color: lime;";
     } else {
