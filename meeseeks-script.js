@@ -675,7 +675,6 @@ async function parseReal(server, input) {
         parseButton.value = "Retry";
     }
     parseButton.disabled = false; stop1.disabled = true;
-    createScrollAnimation('rank-card');
 }
 
 // parsing server and player
