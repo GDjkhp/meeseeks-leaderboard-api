@@ -46,10 +46,27 @@ const serverSelect = document.getElementById('serverIdSelect');
 const serverBox = document.getElementById('serverId');
 serverBox.value = load(serverSelect.value);
 serverSelect.addEventListener('change', () => {
+    saveToLocalStorage('selectedServer', serverSelect.value);
+    if (serverSelect.value === 'id') {
+        const savedCustomId = loadFromLocalStorage('customServerId', '');
+        serverBox.value = savedCustomId;
+    }
+
     serverSelect.value != 'id' ? serverBox.disabled = true : serverBox.disabled = false;
     serverBox.value = load(serverSelect.value);
     setLink("link", `https://mee6.xyz/api/plugins/levels/leaderboard/${serverBox.value}`);
     setLink("linker", `https://mee6.xyz/leaderboard/${serverBox.value}`);
+});
+
+// ADD event listener for custom server ID input
+serverBox.addEventListener('input', () => {
+    if (serverSelect.value === 'id') {
+        // Save custom server ID as user types (with debouncing)
+        clearTimeout(serverBox.saveTimeout);
+        serverBox.saveTimeout = setTimeout(() => {
+            saveToLocalStorage('customServerId', serverBox.value);
+        }, 500); // Wait 500ms after user stops typing
+    }
 });
 
 // returns a neat rank card
@@ -105,7 +122,7 @@ async function parseProfile(player, target) {
         user.parentNode.insertBefore(strike, user);
         strike.appendChild(user);
     }
-    
+
     const servericon = document.getElementsByClassName('serverpng')[target];
     const url2 = `https://cdn.discordapp.com/icons/${result.guild.id}/${result.guild.icon}${highres ? "?size=1024" : ""}`;
     servericon.src = await UrlExists(url2) ? url2 : "https://gdjkhp.github.io/img/dc.png";
@@ -342,7 +359,7 @@ async function call_dev_details() {
     // dev_invite = document.getElementById('invite-leaderboard');
     dev_prefix = document.getElementById('commands-prefix');
     dev_commands = document.getElementById('application-commands-enabled');
-    
+
     dev_rate = document.getElementById('xp-rate');
     dev_per_message = document.getElementById('xp-per-message');
 
@@ -528,10 +545,10 @@ async function multipleSearch(text) {
         if (query[lengthMinus1].search("-") != -1 && isFinite(query[lengthMinus1].split("-")[0])) {
             var left = query[lengthMinus1].split("-")[0];
             var right = query[lengthMinus1].split("-")[1];
-    
+
             var min = Math.min(left, right)-1;
             var max = Math.max(left, right);
-    
+
             queueLimit = max; queue = min;
             page = min / 1000 >> 0;
             await loadJSON(serverId);
@@ -633,8 +650,38 @@ async function yourMom(pussy) {
 var parseButton = document.getElementById('text');
 var node = document.getElementById('name');
 async function parse() {
+    saveToLocalStorage('lastQuery', node.value);
     reset();
     await parseReal(serverBox.value, node.value);
+}
+
+// ADD event listener to save query as user types (optional - for better UX)
+node.addEventListener('input', () => {
+    clearTimeout(node.saveTimeout);
+    node.saveTimeout = setTimeout(() => {
+        if (node.value.trim()) {
+            saveToLocalStorage('lastQuery', node.value);
+        }
+    }, 1000); // Save after 1 second of no typing
+});
+
+function toggleHighres() {
+    highres = !highres;
+    saveToLocalStorage('highres', highres);
+    console.log('High resolution mode:', highres ? 'enabled' : 'disabled');
+}
+
+// ADD function to clear saved data (optional utility function)
+function clearSavedData() {
+    const keys = ['selectedServer', 'customServerId', 'lastQuery', 'highres'];
+    keys.forEach(key => {
+        try {
+            localStorage.removeItem(`meeseeks_${key}`);
+        } catch (error) {
+            console.log('Error clearing localStorage:', error);
+        }
+    });
+    console.log('Cleared all saved user preferences');
 }
 
 function reset() {
@@ -683,7 +730,7 @@ async function parseServer(id) {
     if (serverId != "") await loadJSON(serverId);
     setLink("link", `https://mee6.xyz/api/plugins/levels/leaderboard/${serverId}`);
     setLink("linker", `https://mee6.xyz/leaderboard/${serverId}`);
-    
+
     // json wychee obama
     let json_span = document.getElementById('json');
     json_span = removeAllListeners(json_span);
@@ -936,3 +983,59 @@ function convertDivToImage() {
         link.click();
     });
 }
+
+// localStorage utility functions
+function saveToLocalStorage(key, value) {
+    try {
+        localStorage.setItem(`meeseeks_${key}`, JSON.stringify(value));
+    } catch (error) {
+        console.log('localStorage save error:', error);
+    }
+}
+
+function loadFromLocalStorage(key, defaultValue = null) {
+    try {
+        const stored = localStorage.getItem(`meeseeks_${key}`);
+        return stored ? JSON.parse(stored) : defaultValue;
+    } catch (error) {
+        console.log('localStorage load error:', error);
+        return defaultValue;
+    }
+}
+
+// Initialize saved states on page load
+function initializeSavedStates() {
+    // Load saved server selection
+    const savedServer = loadFromLocalStorage('selectedServer', 'gmd');
+    const savedCustomServerId = loadFromLocalStorage('customServerId', '');
+
+    // Restore server selection
+    serverSelect.value = savedServer;
+
+    // If custom server ID was saved and it's the "id" option, restore it
+    if (savedServer === 'id' && savedCustomServerId) {
+        serverBox.value = savedCustomServerId;
+        serverBox.disabled = false;
+    } else {
+        serverBox.value = load(serverSelect.value);
+        serverBox.disabled = savedServer !== 'id';
+    }
+
+    // Update links with restored server
+    setLink("link", `https://mee6.xyz/api/plugins/levels/leaderboard/${serverBox.value}`);
+    setLink("linker", `https://mee6.xyz/leaderboard/${serverBox.value}`);
+
+    // Load saved search query
+    const savedQuery = loadFromLocalStorage('lastQuery', '');
+    if (savedQuery) {
+        node.value = savedQuery;
+    }
+
+    // Load other preferences
+    const savedHighres = loadFromLocalStorage('highres', false);
+    highres = savedHighres;
+
+    console.log('Restored user preferences from localStorage');
+}
+
+initializeSavedStates();
