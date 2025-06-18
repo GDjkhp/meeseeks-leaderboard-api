@@ -785,7 +785,6 @@ async function embed() {
     }
     // TODO: send PNG to client
 }
-embed();
 
 // server status
 const ping = document.getElementById('status');
@@ -1039,3 +1038,4 @@ function initializeSavedStates() {
 }
 
 initializeSavedStates();
+embed();
