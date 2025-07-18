@@ -858,7 +858,7 @@ function round(num, places) {
 }
 
 function getTime(time) {
-    return `${checkZero((time/1440 >> 0))}\:${checkZero((time/60) % 24 >> 0)}\:${checkZero(time%60)}\:00`;
+    return `${checkZero((time/1440 >> 0))}\\:${checkZero((time/60) % 24 >> 0)}\\:${checkZero(time%60)}\\:00`;
 }
 function checkZero(time) {
     return time < 10 ? `0${time}` : `${time}`;
