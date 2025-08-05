@@ -315,7 +315,7 @@ function real_stats_format(player) {
     return `${player.username}${player.discriminator == "0" ? "" : `#${player.discriminator}`}, RANK #${getRank(player)} LEVEL ${player.level
     }, ${player.detailed_xp[0]}/${player.detailed_xp[1]
     } XP ${round((player.detailed_xp[0] / player.detailed_xp[1]) * 100, 2)
-    }%, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTime(player.message_count)
+    }%, Total XP: ${player.xp}, Total msg: ${player.message_count}, Time spent: ${getTimeSlash(player.message_count)
     }, ${getTotalXP(player.level+1)-player.xp} XP of ${Math.ceil((player.detailed_xp[1]-player.detailed_xp[0])/20)
     } msg left till LEVEL ${player.level+1
     }, ${round((player.xp / topXP) * 100, 2)}% of ${topPlayer}\n`;
@@ -858,6 +858,9 @@ function round(num, places) {
 }
 
 function getTime(time) {
+    return `${checkZero((time/1440 >> 0))}:${checkZero((time/60) % 24 >> 0)}:${checkZero(time%60)}:00`;
+}
+function getTimeSlash(time) {
     return `${checkZero((time/1440 >> 0))}\\:${checkZero((time/60) % 24 >> 0)}\\:${checkZero(time%60)}\\:00`;
 }
 function checkZero(time) {
