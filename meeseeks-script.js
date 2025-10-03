@@ -791,10 +791,10 @@ const ping = document.getElementById('status');
 async function pingpong() {
     if (await UrlExists(`${cors}398627612299362304?limit=1`)) {
         ping.innerHTML = "online";
-        ping.style = "font-weight: bold; color: lime;";
+        ping.style = "color: lime;";
     } else {
         ping.innerHTML = "offline";
-        ping.style = "font-weight: bold; color: red;";
+        ping.style = "color: red;";
     }
 }
 pingpong();
