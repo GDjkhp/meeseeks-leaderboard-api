@@ -12,7 +12,7 @@
 }
 
 body {
-    font-family: font;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: black;
     color: white;
 }
@@ -43,7 +43,7 @@ body {
 .progress {
     background-color: var(--secondary-color);
     border-radius: 10px;
-    height: 20px;
+    height: 22px;
     overflow: hidden;
     display: flex;
     justify-content: flex-start;
@@ -62,8 +62,8 @@ body {
 }
 .progress2 {
     background-color: var(--secondary-color);
-    border-radius: 0px 0px 5px 5px;
-    height: 10px;
+    /* border-radius: 0px 0px 5px 5px; */
+    height: 12px;
     overflow: hidden;
     display: flex;
     justify-content: flex-start;
@@ -126,10 +126,10 @@ body {
 .rankgroup {
     text-align: right;
 }
-.rank {
+.rank, .level {
     font-size: 16px;
 }
-.rank-number {
+.rank-number, .level-number {
     font-size: 32px;
     font-weight: bold;
 }
@@ -138,12 +138,13 @@ body {
 .footergroup {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: 10px;
 }
 .serverpng {
     width: 16px;
     height: 16px;
     border-radius: 50%;
+    margin-right: 4px;
 }
 .otherstats {
     opacity: 0.7;
@@ -194,9 +195,6 @@ td {
     height: 100%;
     position: fixed;
 }
-body *, :not(*) {
-    cursor: url(https://gdjkhp.github.io/img/cursorsmol.png), auto;
-}
 
 img:hover {
 	animation: shake 0.5s;
@@ -223,7 +221,7 @@ img:hover {
 .progress-custom {
     background-color: red;
     border-radius: 10px;
-    height: 20px;
+    height: 22px;
     overflow: hidden;
     display: flex;
     justify-content: flex-start;
@@ -253,4 +251,50 @@ img:hover {
 }
 .progress-segment {
     height: 100%;
+}
+
+.realusername {
+    font-size: 24px;
+    font-weight: bold; 
+}
+
+.hidden-label {
+    font-weight: bold;
+}
+
+@media (max-width: 570px) {
+    .rank-card {
+        width: 300px;
+    }
+    .rank-card-avatar {
+        width: 60px;
+        height: 60px;
+        margin-right: 0px;
+    }
+    .level-number, .rank-number {
+        font-size: 16px;
+    }
+    .realusername {
+        font-size: 12px;
+    }
+    .progress-percent, .progress-percent-custom, .green-xp, .red-xp, .rank, .level, .progress-label, .hidden-label {
+        font-size: 8px;
+    }
+    .progress, .progress-custom {
+        height: 12px;
+    }
+    .progress-percent2 {
+        font-size: 6px;
+    }
+    .progress2 {
+        height: 8px;
+    }
+    .footergroup {
+        font-size: 6px;
+    }
+    .serverpng {
+        width: 8px;
+        height: 8px;
+        margin-right: 2px;
+    }
 }

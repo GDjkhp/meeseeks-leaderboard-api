@@ -28,10 +28,10 @@
         <br>
         <input type="text" value="" id="serverId" disabled>
         <br>
-        <input type="button" value="&#x274C;" id="stop" onclick="halt();">
-        <input type="button" value="&#x2753;" onclick="details();">
-        <input type="button" value="&#x1F4BE;" onclick="convertDivToImage();">
-        <input type="button" value="&#129323;" onclick="dev_details();">
+        <input type="button" value="&#x274C;" id="stop" onclick="halt();" title="halt">
+        <input type="button" value="&#x2753;" onclick="details();" title="faq">
+        <input type="button" value="&#x1F4BE;" onclick="convertDivToImage();" title="save">
+        <input type="button" value="&#129323;" onclick="dev_details();" title="devstuff">
         <br>
         <textarea value="" id="name" style="height: 0;"></textarea>
         <br>
@@ -39,15 +39,15 @@
         <br>
         <span id="timer" style="font-weight: bold;">01:00.00</span>
         <div id="dev" style="display: none;">
-            <span>time fetched:</span>
+            <span>Time fetched:</span>
             <br>
             <span id="time">null</span>
             <br>
-            <span id="json">&boxbox; copy json</span>
-            <span id="wychee">&boxbox; pretty print</span>
+            <span id="json">&boxbox; Copy JSON</span>
+            <span id="wychee">&boxbox; Pretty-print</span>
             <br>
             <details>
-                <summary>server data</summary>
+                <summary>Server data</summary>
                 <img id="dev-server-img" width="16">
                 <span id="dev-server-name"></span>
                 <br>
@@ -113,30 +113,32 @@
             </details>
         </div>
         <div id="foot" style="display: none;">
+            <span>How do I use this shit?</span>
             <table class="params">
                 <tr>
-                    <th>parameters</th>
-                    <td>description</td>
+                    <th>Parameters</th>
+                    <td>Description</td>
                 </tr>
                 <tr>
                     <th><span style="color:lime">[string]</span> <br>
-                        (<span style="color:red">GDjkhp#3732</span>, 
+                        <span style="color:red">GDjkhp#3732</span>, 
                         <span style="color:magenta">wychee</span>, 
-                        <span style="color:orange">#42069</span>)
+                        <span style="color:orange">#42069</span>
                         <br><br>
                         <span style="color:yellow">[integer]</span> <br>
-                        (<span style="color:blue">290162530720940034</span>)
+                        <span style="color:blue">290162530720940034</span>
                     </th>
-                    <td>returns player card, case-sensitive</td>
+                    <td>Returns a player card, case-sensitive</td>
                 </tr>
                 <tr>
                     <th><span style="color:yellow">[integer]</span> <br>
-                        (<span style="color:cyan">10</span>, 
-                        <span style="color:hotpink">69-420</span>)</span>
+                        <span style="color:cyan">10</span>, 
+                        <span style="color:hotpink">69-420</span></span>
                     </th>
-                    <td>returns top player cards</td>
+                    <td>Returns a list of player cards</td>
                 </tr>
             </table>
+            <br>
             <span>This site does not log or store any data from the API.</span>
             <div>
                 <span>All fetched data are publicly available in:</span>
@@ -145,16 +147,13 @@
                 <br>
                 <a target="_blank" id="link"></a>
             </div>
+            <br>
             <div style="display: flex; justify-content: space-evenly;">
                 <div>
-                    <span>status: </span>
-                    <span id="status">pinging...</span>
+                    <span>Status: </span>
+                    <span id="status">Pinging...</span>
                     <span> / </span>
-                    <a target="_blank" href="https://gdjkhp.github.io/">report</a>
-                </div>
-                <div>
-                    <span>source code: </span>
-                    <a target="_blank" href="https://github.com/GDjkhp/meeseeks-leaderboard-api"><img width="16" src="https://gdjkhp.github.io/img/git.png"></a>
+                    <a target="_blank" href="https://github.com/GDjkhp/meeseeks-leaderboard-api">source code</a>
                 </div>
             </div>
         </div>

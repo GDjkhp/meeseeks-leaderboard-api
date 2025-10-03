@@ -79,7 +79,7 @@ async function parseProfile(player, target) {
 
     const user = document.getElementsByClassName('realusername')[target];
     user.innerHTML = player.username;
-    user.style = `font-size: 24px; font-weight: bold; color: ${color};`;
+    user.style = `color: ${color};`;
     // strikethrough update fix
     const parent = document.getElementsByClassName("username")[target];
     const elementToRemove = parent.querySelector("s");
@@ -98,10 +98,10 @@ async function parseProfile(player, target) {
 
     const level = document.getElementsByClassName('level-number')[target];
     level.innerHTML = player.level;
-    level.style = `font-size: 32px; font-weight: bold; color: ${color};`;
+    level.style = `color: ${color};`;
 
     const level1 = document.getElementsByClassName('level')[target];
-    level1.style = `font-size: 16px; color: ${color};`;
+    level1.style = `color: ${color};`;
 
     const xp = document.getElementsByClassName('progress-label-current')[target];
     xp.innerHTML = player.detailed_xp[0];
@@ -926,19 +926,22 @@ function addCard() {
                 </div>
             </div>
             <div class="hiddengroup" style="display: none;">
-                <span class="copy">&boxbox; copy statistics</span>
-                <span class="copylink">&boxbox; copy link</span>
                 <br>
-                <input type="text" value="0" class="level-select">
-                <br>
-                <input type="button" value="-" class="minus">
-                <input type="button" value="+" class="plus">
+                <span class="hidden-label">Overall Progress till Specified Level</span>
                 <div class="progress-custom">
                     <div class="progress-bar-custom"></div>
                     <span class="progress-percent-custom"></span>
                 </div>
                 <span class="green-xp">? / ? XP </span>
                 <span class="red-xp">(? XP left)</span>
+                <br>
+                <input type="text" value="0" class="level-select">
+                <br>
+                <input type="button" value="-" class="minus">
+                <input type="button" value="+" class="plus">
+                <br>
+                <span class="copy">&boxbox; Copy statistics</span>
+                <span class="copylink">&boxbox; Copy link</span>
             </div>
         </div>
     `;
