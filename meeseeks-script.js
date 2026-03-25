@@ -1,4 +1,4 @@
-var cors = "https://cors-anywhere.com/https://mee6.xyz/api/plugins/levels/leaderboard/", 
+var cors = "https://api.codetabs.com/v1/proxy?quest=https://mee6.xyz/api/plugins/levels/leaderboard/", 
 result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = false, turing = false, topXP, topPlayer, highres = false;
 
 // cors unblocked api server, please don't abuse (rate limited, can ip ban the server, delays 500ms)
