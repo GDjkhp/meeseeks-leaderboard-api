@@ -262,7 +262,25 @@ img:hover {
     font-weight: bold;
 }
 
+.footinfo {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+@media (max-width: 1000px) {
+    .footinfo {
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 570px) {
+    .querygroup {
+        width: 95%;
+        max-width: 100%;
+        padding: 8px;
+        border-width: 2px;
+    }
     .rank-card {
         width: 300px;
     }
