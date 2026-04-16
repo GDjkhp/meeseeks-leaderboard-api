@@ -4,7 +4,7 @@ result, page = 0, serverId, queue, queueLimit, previousQueue = null, update = fa
 // cors unblocked api server, please don't abuse (rate limited, can ip ban the server, delays 500ms)
 async function loadJSON(id) {
     if (turing) return;
-    result = await fetch(`${cors}${id}?page=${page}&limit=1000`).then(res => res.json());
+    result = await fetch(`${cors}${id}?limit=1000&page=${page}`).then(res => res.json());
     console.log(result);
     await call_dev_details();
     if (page == 0) {
