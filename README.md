@@ -9,7 +9,7 @@ Pointless efforts to brag your meeseeks rank instead of typing !rank that no one
 ![](https://img.shields.io/github/commit-activity/t/GDjkhp/meeseeks-leaderboard-api)
 
 ## License
-meeseeks-leaderboard-api is licensed under the [Do What The Fuck You Want To Public License](http://www.wtfpl.net)
+meeseeks-leaderboard-api is licensed under the [Do What The Fuck You Want To Public License](https://www.wtfpl.net)
 
 ## Support
 Feature requests, contributions, and improvements are welcome!
