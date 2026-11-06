@@ -274,11 +274,14 @@ function segs(player, barCustom, nextLevel) {
     barCustom.innerHTML = '' // Clear any existing segments
     let completedXP = 0;
     let totalPercentage = 0;
+    // if the target level is below the player's actual level, render as if the player were at the target level
+    const targetLevel = Number(nextLevel);
+    const effLevel = Math.min(player.level, targetLevel);
 
     roleRewards.forEach((reward, index) => {
-        if (player.level >= reward.rank) {
-            const nextReward = roleRewards[index + 1] || { rank: player.level + 1 };
-            const segmentXP = getTotalXP(Math.min(player.level, nextReward.rank)) - getTotalXP(reward.rank);
+        if (effLevel >= reward.rank) {
+            const nextReward = roleRewards[index + 1] || { rank: effLevel + 1 };
+            const segmentXP = getTotalXP(Math.min(effLevel, nextReward.rank)) - getTotalXP(reward.rank);
             const segmentPercentage = (segmentXP / getTotalXP(nextLevel)) * 100;
 
             if (segmentPercentage > 0) {
@@ -296,13 +299,13 @@ function segs(player, barCustom, nextLevel) {
     // console.log(`Total percentage: ${totalPercentage.toFixed(2)}%`);
 
     // Add remaining progress for the current level
-    const remainingXP = player.xp - completedXP;
+    const remainingXP = Math.min(player.xp, getTotalXP(targetLevel)) - completedXP;
     const remainingPercentage = (remainingXP / getTotalXP(nextLevel)) * 100;
     if (remainingPercentage > 0) {
         const remainingDiv = document.createElement('div');
         remainingDiv.className = 'progress-segment';
         remainingDiv.style.width = `${remainingPercentage}%`;
-        remainingDiv.style.backgroundColor = getRoleColor(player.level);
+        remainingDiv.style.backgroundColor = getRoleColor(effLevel);
         barCustom.appendChild(remainingDiv);
     }
 
